@@ -16,6 +16,11 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Test artifacts
+cypress/screenshots
+cypress/videos
+cypress/downloads
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
