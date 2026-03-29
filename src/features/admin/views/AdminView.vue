@@ -1,75 +1,82 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getAdminDashboardData, getAuditLogPage } from '@/features/admin/api'
-import { clampPage, getTotalPages, hasPageItems, parsePositiveInt, resolvePageSize } from '@/shared'
+import {
+  hasPageItems,
+  resolvePageSize,
+  useAsyncState,
+  usePaginationState,
+  useRoutePageQuery,
+} from '@/shared'
 
-const isLoading = ref(false)
-const errorMessage = ref('')
-const dashboard = ref<Awaited<ReturnType<typeof getAdminDashboardData>> | null>(null)
-const auditLogPage = ref<Awaited<ReturnType<typeof getAuditLogPage>> | null>(null)
-const page = ref(1)
 const route = useRoute()
 const router = useRouter()
 const pageSizeOptions = [2, 5, 10]
-const pageSize = ref(2)
-const isPageLoading = ref(false)
+const dashboardState = useAsyncState<Awaited<ReturnType<typeof getAdminDashboardData>>>()
+const auditLogPageState = useAsyncState<Awaited<ReturnType<typeof getAuditLogPage>>>()
+const pagination = usePaginationState({
+  pageSizeOptions,
+  initialPageSize: 2,
+})
+const pageQuery = useRoutePageQuery({
+  route,
+  router,
+  pageKey: 'adminPage',
+  pageSizeKey: 'adminPageSize',
+})
 
-const totalPages = computed(() =>
-  getTotalPages(auditLogPage.value?.meta.total ?? 0, pageSize.value),
+const dashboard = dashboardState.data
+const auditLogPage = auditLogPageState.data
+const isLoading = dashboardState.isLoading
+const isPageLoading = auditLogPageState.isLoading
+const page = pagination.page
+const pageSize = pagination.pageSize
+const totalPages = pagination.totalPages
+const canGoPrev = pagination.canGoPrev
+const canGoNext = pagination.canGoNext
+const errorMessage = computed(
+  () => dashboardState.errorMessage.value || auditLogPageState.errorMessage.value,
 )
-const canGoPrev = computed(() => page.value > 1)
-const canGoNext = computed(() => page.value < totalPages.value)
 const hasAuditData = computed(() => hasPageItems(auditLogPage.value?.items))
 
 async function loadAdminDashboard() {
-  isLoading.value = true
-  errorMessage.value = ''
-  try {
-    dashboard.value = await getAdminDashboardData()
-  } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : '加载管理数据失败'
-  } finally {
-    isLoading.value = false
-  }
+  await dashboardState.run(() => getAdminDashboardData(), '加载管理数据失败')
 }
 
 async function loadAuditPage(targetPage: number) {
-  isPageLoading.value = true
-  errorMessage.value = ''
-  try {
-    const safePage = clampPage(targetPage, totalPages.value)
-    const result = await getAuditLogPage({ page: safePage, pageSize: pageSize.value })
-    auditLogPage.value = result
-    page.value = clampPage(result.meta.page, getTotalPages(result.meta.total, result.meta.pageSize))
-    await router.replace({
-      query: {
-        ...route.query,
-        page: String(page.value),
-        pageSize: String(pageSize.value),
-      },
-    })
-  } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : '加载审计日志失败'
-  } finally {
-    isPageLoading.value = false
+  const safePage = targetPage > 0 ? targetPage : 1
+  const result = await auditLogPageState.run(
+    () => getAuditLogPage({ page: safePage, pageSize: pageSize.value }),
+    '加载审计日志失败',
+  )
+  if (!result) {
+    return
   }
+
+  pagination.setTotal(result.meta.total)
+  pagination.setPageSize(result.meta.pageSize)
+  pagination.setPage(result.meta.page)
+  await pageQuery.syncQuery({
+    page: page.value,
+    pageSize: pageSize.value,
+  })
 }
 
 function goPrevPage() {
-  if (!canGoPrev.value) {
+  if (!pagination.goPrevPage()) {
     return
   }
 
-  void loadAuditPage(page.value - 1)
+  void loadAuditPage(page.value)
 }
 
 function goNextPage() {
-  if (!canGoNext.value) {
+  if (!pagination.goNextPage()) {
     return
   }
 
-  void loadAuditPage(page.value + 1)
+  void loadAuditPage(page.value)
 }
 
 function onPageSizeChange(event: Event) {
@@ -84,21 +91,20 @@ function onPageSizeChange(event: Event) {
     return
   }
 
-  pageSize.value = nextPageSize
+  pagination.setPageSizeAndReset(nextPageSize)
   void loadAuditPage(1)
 }
 
 onMounted(() => {
-  const initPageSize = resolvePageSize(
-    parsePositiveInt(route.query.pageSize, pageSize.value),
+  const initialState = pageQuery.resolveInitialState({
+    defaultPage: page.value,
+    defaultPageSize: pageSize.value,
     pageSizeOptions,
-    pageSize.value,
-  )
-  const initPage = parsePositiveInt(route.query.page, page.value)
-  pageSize.value = initPageSize
-  page.value = initPage
+  })
+  pagination.setPageSize(initialState.pageSize)
+  pagination.setPage(initialState.page)
   void loadAdminDashboard()
-  void loadAuditPage(initPage)
+  void loadAuditPage(initialState.page)
 })
 </script>
 

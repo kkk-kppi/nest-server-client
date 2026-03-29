@@ -17,6 +17,9 @@ export default defineConfig({
       reporter: ['text', 'html'],
       include: [
         'src/shared/pagination.ts',
+        'src/shared/composables/useAsyncState.ts',
+        'src/shared/composables/usePaginationState.ts',
+        'src/shared/composables/useRoutePageQuery.ts',
         'src/shared/components/atoms/CounterButton.vue',
         'src/features/auth/permission.ts',
         'src/features/home/components/HomeHeroPanel.vue',

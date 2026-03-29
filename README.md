@@ -28,6 +28,7 @@
 - **分层目录**：`app` 负责装配，`core` 提供基础能力，`features` 承载业务域，`shared` 提供跨域复用
 - **权限与路由**：支持基于角色/权限的动态路由与守卫拦截
 - **HTTP 中台**：统一请求封装、鉴权头注入、401 处理与错误归一
+- **副作用治理**：沉淀 `useAsyncState/usePaginationState/useRoutePageQuery` 复用模式
 - **资源管理**：图片资源位于 `src/assets`，图标资源位于 `public`
 - **样式组织**：全局样式集中在 `src/style.css`
 
@@ -38,6 +39,7 @@
 - RBAC 权限路由与动态菜单路由注册
 - Axios 请求中台与统一错误处理
 - Workspace/Admin 页面分页与查询参数联动
+- composables 约定与副作用治理（loading/error/data、分页状态、query 同步）
 - Vitest + Vue Test Utils 单测体系（覆盖率门禁）
 - 深浅色主题适配（基于 `prefers-color-scheme`）
 - 生产构建与静态预览能力
@@ -290,6 +292,10 @@ nest-server-client/
 │  │  │  └─ views/WorkspaceView.vue
 │  │  └─ index.ts
 │  ├─ shared/
+│  │  ├─ composables/
+│  │  │  ├─ useAsyncState.ts
+│  │  │  ├─ usePaginationState.ts
+│  │  │  └─ useRoutePageQuery.ts
 │  │  ├─ components/
 │  │  │  └─ atoms/CounterButton.vue
 │  │  ├─ index.ts
