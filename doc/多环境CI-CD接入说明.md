@@ -20,7 +20,7 @@
 
 ## 3. 触发策略
 
-## 3.1 自动触发（push）
+### 3.1 自动触发（push）
 
 - `develop` 分支：走质量门禁 + `deploy_dev`
 - `test` 分支：走质量门禁 + `deploy_test`
@@ -34,8 +34,10 @@
 
 ### 3.3 手动触发（workflow_dispatch）
 
+- 支持 `action` 选择：`deploy` / `rollback`
 - 支持 `target` 选择：`dev` / `test` / `stage` / `prod` / `all`
-- 手动触发会执行质量门禁与构建产物，再按目标环境执行部署 job
+- `action=deploy`：执行质量门禁与构建产物，再按目标环境执行部署 job
+- `action=rollback`：执行指定环境回滚 job（需选择单环境 target，且可传 `rollback_version`）
 
 ---
 
@@ -63,7 +65,13 @@
 
 - 按分支或手动目标触发
 - 从 artifact 下载 `dist` 后执行对应部署命令
-- 当前部署命令通过 GitHub Secrets 注入，未配置时会自动跳过并输出提示
+- 部署命令通过 GitHub Secrets 注入，未配置会直接失败并阻断发布
+
+### 4.4 rollback
+
+- 仅在 `workflow_dispatch` 且 `action=rollback` 时触发
+- 根据 `target` 选择执行对应环境回滚命令
+- 可通过 `rollback_version` 传入回滚版本（供回滚命令读取）
 
 ---
 
@@ -75,6 +83,10 @@
 - `TEST_DEPLOY_COMMAND`
 - `STAGE_DEPLOY_COMMAND`
 - `PROD_DEPLOY_COMMAND`
+- `DEV_ROLLBACK_COMMAND`
+- `TEST_ROLLBACK_COMMAND`
+- `STAGE_ROLLBACK_COMMAND`
+- `PROD_ROLLBACK_COMMAND`
 
 建议命令格式为单行可执行 shell 命令，例如：
 
@@ -138,13 +150,21 @@ pnpm build
 
 PR 仅做质量验证，避免预览分支误发版。部署仅在 push 到环境分支或手动触发时执行。
 
-### 9.2 为什么部署 job 显示跳过
+### 9.2 为什么部署 job 失败
 
-通常是对应环境的 `*_DEPLOY_COMMAND` 未配置，或当前分支不匹配该环境触发条件。
+通常是对应环境的 `*_DEPLOY_COMMAND` 未配置，或命令本身执行失败。当前策略会直接失败并阻断发布。
 
 ### 9.3 如何一次触发所有环境
 
 在 Actions 页面手动触发 `multi-env-ci-cd`，`target` 选择 `all`。
+
+### 9.4 如何手动触发回滚
+
+在 Actions 页面手动触发 `multi-env-ci-cd`，设置：
+
+- `action=rollback`
+- `target=dev|test|stage|prod`（不支持 all）
+- `rollback_version`（按你的回滚脚本约定填写）
 
 ---
 

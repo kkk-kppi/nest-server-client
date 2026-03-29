@@ -17,6 +17,14 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      action:
+        type: choice
+        description: deploy or rollback
+        required: true
+        default: deploy
+        options:
+          - deploy
+          - rollback
       target:
         type: choice
         description: target environment
@@ -28,6 +36,10 @@ on:
           - stage
           - prod
           - all
+      rollback_version:
+        type: string
+        description: rollback version tag or release id
+        required: false
 
 concurrency:
   group: multi-env-ci-cd-${{ github.ref }}
@@ -39,6 +51,7 @@ env:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.action == 'deploy'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -58,7 +71,9 @@ jobs:
   build_artifact:
     runs-on: ubuntu-latest
     needs: quality
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy')
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -81,18 +96,18 @@ jobs:
     environment: dev
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'dev' || github.event.inputs.target == 'all'))
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && (github.event.inputs.target == 'dev' || github.event.inputs.target == 'all'))
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
-          if [ -n "${{ secrets.DEV_DEPLOY_COMMAND }}" ]; then
-            eval "${{ secrets.DEV_DEPLOY_COMMAND }}"
-          else
-            echo "DEV_DEPLOY_COMMAND is not configured. Skip deploy."
+          if [ -z "${{ secrets.DEV_DEPLOY_COMMAND }}" ]; then
+            echo "DEV_DEPLOY_COMMAND is not configured."
+            exit 1
           fi
+          eval "${{ secrets.DEV_DEPLOY_COMMAND }}"
 
   deploy_test:
     runs-on: ubuntu-latest
@@ -100,18 +115,18 @@ jobs:
     environment: test
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/test') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'test' || github.event.inputs.target == 'all'))
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && (github.event.inputs.target == 'test' || github.event.inputs.target == 'all'))
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
-          if [ -n "${{ secrets.TEST_DEPLOY_COMMAND }}" ]; then
-            eval "${{ secrets.TEST_DEPLOY_COMMAND }}"
-          else
-            echo "TEST_DEPLOY_COMMAND is not configured. Skip deploy."
+          if [ -z "${{ secrets.TEST_DEPLOY_COMMAND }}" ]; then
+            echo "TEST_DEPLOY_COMMAND is not configured."
+            exit 1
           fi
+          eval "${{ secrets.TEST_DEPLOY_COMMAND }}"
 
   deploy_stage:
     runs-on: ubuntu-latest
@@ -119,18 +134,18 @@ jobs:
     environment: stage
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/stage') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'stage' || github.event.inputs.target == 'all'))
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && (github.event.inputs.target == 'stage' || github.event.inputs.target == 'all'))
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
-          if [ -n "${{ secrets.STAGE_DEPLOY_COMMAND }}" ]; then
-            eval "${{ secrets.STAGE_DEPLOY_COMMAND }}"
-          else
-            echo "STAGE_DEPLOY_COMMAND is not configured. Skip deploy."
+          if [ -z "${{ secrets.STAGE_DEPLOY_COMMAND }}" ]; then
+            echo "STAGE_DEPLOY_COMMAND is not configured."
+            exit 1
           fi
+          eval "${{ secrets.STAGE_DEPLOY_COMMAND }}"
 
   deploy_prod:
     runs-on: ubuntu-latest
@@ -138,15 +153,50 @@ jobs:
     environment: prod
     if: |
       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))) ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'prod' || github.event.inputs.target == 'all'))
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && (github.event.inputs.target == 'prod' || github.event.inputs.target == 'all'))
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
-          if [ -n "${{ secrets.PROD_DEPLOY_COMMAND }}" ]; then
-            eval "${{ secrets.PROD_DEPLOY_COMMAND }}"
-          else
-            echo "PROD_DEPLOY_COMMAND is not configured. Skip deploy."
+          if [ -z "${{ secrets.PROD_DEPLOY_COMMAND }}" ]; then
+            echo "PROD_DEPLOY_COMMAND is not configured."
+            exit 1
           fi
+          eval "${{ secrets.PROD_DEPLOY_COMMAND }}"
+
+  rollback:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'rollback' && github.event.inputs.target != 'all'
+    environment: ${{ github.event.inputs.target }}
+    steps:
+      - run: |
+          TARGET="${{ github.event.inputs.target }}"
+          if [ "$TARGET" = "all" ]; then
+            echo "Rollback does not support target=all. Please choose a single environment."
+            exit 1
+          fi
+          case "$TARGET" in
+            dev)
+              CMD='${{ secrets.DEV_ROLLBACK_COMMAND }}'
+              ;;
+            test)
+              CMD='${{ secrets.TEST_ROLLBACK_COMMAND }}'
+              ;;
+            stage)
+              CMD='${{ secrets.STAGE_ROLLBACK_COMMAND }}'
+              ;;
+            prod)
+              CMD='${{ secrets.PROD_ROLLBACK_COMMAND }}'
+              ;;
+            *)
+              echo "Unknown target: $TARGET"
+              exit 1
+              ;;
+          esac
+          if [ -z "$CMD" ]; then
+            echo "Rollback command is not configured for $TARGET."
+            exit 1
+          fi
+          RELEASE_VERSION="${{ github.event.inputs.rollback_version }}" eval "$CMD"
