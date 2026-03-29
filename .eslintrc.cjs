@@ -21,4 +21,16 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
   },
+  overrides: [
+    {
+      files: ['cypress/**/*.ts'],
+      globals: {
+        cy: 'readonly',
+        Cypress: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        beforeEach: 'readonly',
+      },
+    },
+  ],
 }

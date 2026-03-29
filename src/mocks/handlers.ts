@@ -111,6 +111,14 @@ export const handlers = [
   }),
   http.get(resolveMockPath(getWorkspaceTaskPageEndpoint.path), ({ request }) => {
     const query = resolvePageQuery<WorkspaceTaskPageQuery>(request)
+    if (query.page === 500) {
+      return HttpResponse.json(
+        {
+          message: 'mock server error',
+        },
+        { status: 500 },
+      )
+    }
     return HttpResponse.json(resolvePageResult(workspaceTasks, query))
   }),
   http.get(resolveMockPath(getAdminDashboardEndpoint.path), () => {

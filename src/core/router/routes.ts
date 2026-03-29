@@ -26,6 +26,9 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/features/admin/views/AdminView.vue'),
     meta: {
       title: 'Admin',
+      requiresAuth: true,
+      roles: ['admin'],
+      permissions: ['admin:read'],
     },
   },
   {
@@ -34,6 +37,9 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/features/workspace/views/WorkspaceView.vue'),
     meta: {
       title: 'Workspace',
+      requiresAuth: true,
+      roles: ['admin', 'editor', 'viewer'],
+      permissions: ['workspace:read'],
     },
   },
   {
