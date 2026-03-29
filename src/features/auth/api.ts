@@ -1,41 +1,31 @@
-import { post } from '@/core/http'
-import { appEnv } from '@/core/config/env'
+import {
+  definePostEndpoint,
+  requestEndpoint,
+  type InferEndpointRequest,
+  type InferEndpointResponse,
+} from '@/core/http'
 import type { UserRole } from './store/useAuthStore'
 
-export interface LoginPayload {
-  role: UserRole
-}
+export const loginByRoleEndpoint = definePostEndpoint<
+  '/api/auth/login-by-role',
+  {
+    accessToken: string
+    roles: UserRole[]
+    permissions: string[]
+  },
+  {
+    role: UserRole
+  }
+>('/api/auth/login-by-role')
 
-export interface LoginResult {
-  accessToken: string
-  roles: UserRole[]
-  permissions: string[]
-}
-
-const mockLoginMap: Record<UserRole, LoginResult> = {
-  admin: {
-    accessToken: 'admin-token',
-    roles: ['admin'],
-    permissions: ['workspace:read', 'admin:read'],
-  },
-  editor: {
-    accessToken: 'editor-token',
-    roles: ['editor'],
-    permissions: ['workspace:read'],
-  },
-  viewer: {
-    accessToken: 'viewer-token',
-    roles: ['viewer'],
-    permissions: ['workspace:read'],
-  },
-}
+export type LoginPayload = InferEndpointRequest<typeof loginByRoleEndpoint>
+export type LoginResult = InferEndpointResponse<typeof loginByRoleEndpoint>
 
 export async function loginByRole(payload: LoginPayload) {
-  if (appEnv.mode !== 'production') {
-    return Promise.resolve(mockLoginMap[payload.role])
-  }
-
-  return post<LoginResult, LoginPayload>('/api/auth/login-by-role', payload, {
-    timeout: 8000,
+  return requestEndpoint(loginByRoleEndpoint, {
+    payload,
+    config: {
+      timeout: 8000,
+    },
   })
 }

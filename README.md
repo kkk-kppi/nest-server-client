@@ -38,8 +38,10 @@
 - Vite 开发服务器（支持 HMR 热更新）
 - RBAC 权限路由与动态菜单路由注册
 - Axios 请求中台与统一错误处理
+- API endpoint 声明 + 请求/响应类型自动推导（`InferEndpointRequest/InferEndpointResponse`）
 - Workspace/Admin 页面分页与查询参数联动
 - composables 约定与副作用治理（loading/error/data、分页状态、query 同步）
+- MSW 浏览器端 Mock（通过 `VITE_ENABLE_MOCK` 开关启用）
 - Vitest + Vue Test Utils 单测体系（覆盖率门禁）
 - 深浅色主题适配（基于 `prefers-color-scheme`）
 - 生产构建与静态预览能力
@@ -149,9 +151,9 @@ const count = ref(0)
 
 - `src/core/http`：Axios 实例、请求封装、拦截器、错误类型
 - `src/features/*/api.ts`：按业务域组织接口（auth/workspace/admin）
-- 非生产环境内置 mock 数据，生产环境走 `/api/*` 请求
+- `src/mocks/*`：MSW handlers 与 worker 启动入口（按环境变量开关）
 
-当前仓库未提供 OpenAPI/Swagger 自动生成能力，接口类型以手写 TS 类型为主。
+当前仓库未接入 OpenAPI/Swagger 自动生成，但已通过 endpoint 声明实现请求/响应类型自动推导。
 
 ### NestJS 对接约定模板（建议）
 
@@ -163,6 +165,7 @@ const count = ref(0)
 
 ```bash
 VITE_API_BASE_URL=http://localhost:3000
+VITE_ENABLE_MOCK=true
 ```
 
 建议封装访问入口（示例）：
@@ -202,9 +205,13 @@ src/
 ├─ core/
 │  └─ http/
 │     ├─ client.ts        # axios 实例
+│     ├─ endpoint.ts      # endpoint 声明与类型推导
 │     ├─ interceptors.ts  # 鉴权与异常处理
 │     ├─ request.ts       # get/post/put/patch/delete 封装
 │     └─ types.ts         # 通用请求/响应类型
+├─ mocks/
+│  ├─ browser.ts          # MSW worker 启动
+│  └─ handlers.ts         # 接口 mock handlers
 └─ features/
    ├─ auth/api.ts
    ├─ workspace/api.ts
@@ -214,21 +221,20 @@ src/
 #### 5) TypeScript 类型示例
 
 ```ts
-export interface ApiResponse<T> {
-  code: number
-  message: string
-  data: T
-}
+import {
+  definePostEndpoint,
+  type InferEndpointRequest,
+  type InferEndpointResponse,
+} from '@/core/http'
 
-export interface LoginRequest {
-  username: string
-  password: string
-}
+const loginByRoleEndpoint = definePostEndpoint<
+  '/api/auth/login-by-role',
+  { accessToken: string; roles: string[]; permissions: string[] },
+  { role: 'admin' | 'editor' | 'viewer' }
+>('/api/auth/login-by-role')
 
-export interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-}
+type LoginPayload = InferEndpointRequest<typeof loginByRoleEndpoint>
+type LoginResult = InferEndpointResponse<typeof loginByRoleEndpoint>
 ```
 
 ## 项目结构
@@ -244,7 +250,8 @@ nest-server-client/
 │  └─ 环境变量提交规范.md
 ├─ public/
 │  ├─ favicon.svg
-│  └─ icons.svg
+│  ├─ icons.svg
+│  └─ mockServiceWorker.js
 ├─ src/
 │  ├─ assets/
 │  │  ├─ hero.png
@@ -263,10 +270,14 @@ nest-server-client/
 │  │  │  └─ env.ts
 │  │  ├─ http/
 │  │  │  ├─ client.ts
+│  │  │  ├─ endpoint.ts
 │  │  │  ├─ index.ts
 │  │  │  ├─ interceptors.ts
 │  │  │  ├─ request.ts
 │  │  │  └─ types.ts
+│  ├─ mocks/
+│  │  ├─ browser.ts
+│  │  └─ handlers.ts
 │  │  ├─ router/
 │  │  │  ├─ dynamic.ts
 │  │  │  ├─ guards.ts
@@ -331,6 +342,7 @@ nest-server-client/
 - `pnpm format`：执行 Prettier 格式化
 - `pnpm test`：运行单元测试
 - `pnpm test:coverage`：运行单元测试并输出覆盖率报告
+- `pnpm verify:api`：一键验证 API 改动（`typecheck` + API 请求层单测）
 - `pnpm build`：执行类型检查并构建生产包
 - `pnpm preview`：预览构建产物
 

@@ -1,3 +1,12 @@
 import { bootstrap } from './app/bootstrap'
+import { appEnv } from './core/config/env'
 
-bootstrap()
+async function startApp() {
+  if (appEnv.enableMock) {
+    const { enableMocking } = await import('./mocks/browser')
+    await enableMocking()
+  }
+  bootstrap()
+}
+
+void startApp()

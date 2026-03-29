@@ -21,6 +21,22 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/features/admin/views/AdminView.vue'),
+    meta: {
+      title: 'Admin',
+    },
+  },
+  {
+    path: '/workspace',
+    name: 'workspace',
+    component: () => import('@/features/workspace/views/WorkspaceView.vue'),
+    meta: {
+      title: 'Workspace',
+    },
+  },
+  {
     path: '/forbidden',
     name: 'forbidden',
     component: ForbiddenView,
