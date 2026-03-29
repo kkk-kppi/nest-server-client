@@ -1,0 +1,25 @@
+import { createApp } from 'vue'
+import AppRoot from './AppRoot.vue'
+import { createStore } from '@/core/store'
+import { createAppRouter } from '@/core/router'
+import { setAccessTokenGetter, setUnauthorizedHandler } from '@/core/http'
+import { useAuthStore } from '@/features/auth/store/useAuthStore'
+import '../style.css'
+
+export function bootstrap() {
+  const app = createApp(AppRoot)
+  const store = createStore()
+  const router = createAppRouter()
+  app.use(store)
+  app.use(router)
+
+  const authStore = useAuthStore()
+  setAccessTokenGetter(() => authStore.accessToken)
+  setUnauthorizedHandler(() => {
+    authStore.clearSession()
+    authStore.setAuthNotice('登录状态已失效，请重新登录')
+    router.replace({ name: 'home' })
+  })
+
+  app.mount('#app')
+}
