@@ -56,10 +56,34 @@
 
 任一阶段失败即阻断后续构建与部署。
 
+预算对齐策略：
+
+- 固定 `VITE_ENABLE_MOCK=false`
+- 固定 `VITE_ENTRY_JS_BUDGET_KIB=300`
+- 固定 `VITE_ASYNC_CHUNK_BUDGET_KIB=300`
+- 构建前统一解析并注入 `VITE_BUILD_PRESET`
+  - `develop -> development`
+  - `test -> test`
+  - `stage -> stage`
+  - `main/tag(v*) -> prod`
+  - `workflow_dispatch` 场景按 `target` 解析（`dev/test/stage/prod`）
+- `pnpm build` 失败即视为性能预算门禁未通过
+- `Resolve build preset` 步骤已在 `quality` 与 `build_artifact` 间复用，避免多处脚本漂移
+
+`VITE_BUILD_PRESET` 解析优先级：
+
+1. `workflow_dispatch(action=deploy)`：优先按 `target` 映射
+2. `pull_request`：按 `base_ref`（目标分支）映射
+3. `push/tag`：按当前 `ref` 映射
+4. 未命中映射时回退 `production`
+
+映射结果只用于设置构建预设，预算阈值仍由固定变量 `VITE_ENTRY_JS_BUDGET_KIB` 与 `VITE_ASYNC_CHUNK_BUDGET_KIB` 约束。
+
 ### 4.2 build_artifact
 
 - 在 push / workflow_dispatch 事件下执行
 - 重新构建并上传 `dist` 为工作流产物（artifact）
+- `quality` 阶段额外上传 `dist/bundle-report.html` 为 `bundle-report-${sha}`，用于分包回归对照
 
 ### 4.3 deploy_dev / deploy_test / deploy_stage / deploy_prod
 
@@ -166,6 +190,17 @@ PR 仅做质量验证，避免预览分支误发版。部署仅在 push 到环�
 - `target=dev|test|stage|prod`（不支持 all）
 - `rollback_version`（按你的回滚脚本约定填写）
 
+### 9.5 如何排查 `VITE_BUILD_PRESET` 与预期不一致
+
+按以下顺序定位：
+
+1. 确认触发类型（`workflow_dispatch` / `pull_request` / `push`）
+2. 在工作流日志查看 `Resolve build preset` 步骤输出，确认最终写入的 `VITE_BUILD_PRESET`
+3. 若是 `workflow_dispatch(action=deploy)`，优先核对 `target` 值
+4. 若是 `pull_request`，核对 `base_ref` 是否为 `develop/test/stage/main`
+5. 若是 `push/tag`，核对 `ref` 是否命中 `develop/test/stage/main/v*`
+6. 仍不符合预期时，按回退规则视为 `production`，并在 PR 说明中标注原因
+
 ---
 
 ## 10. 后续演进建议
@@ -174,3 +209,16 @@ PR 仅做质量验证，避免预览分支误发版。部署仅在 push 到环�
 - 为 prod 增加环境审批与保护分支策略
 - 接入部署后健康检查与自动回滚
 - 在 CI 中补充 E2E 定时任务与失败告警
+
+---
+
+## 11. stage 验收操作清单（性能预算）
+
+适用场景：`stage` 分支 push 后，确认本次发布满足分包与预算门禁。
+
+1. 打开 GitHub Actions，进入对应的 `multi-env-ci-cd` 工作流运行记录。
+2. 确认 `quality` job 成功，且 `pnpm build` 未触发预算错误。
+3. 在 Artifacts 区域下载 `bundle-report-${sha}`。
+4. 解压后打开 `bundle-report.html`，核对入口静态链路体积是否仍在预算线内。
+5. 对照基线重点关注 `framework-routing-state`、`framework-http`、`vendor` 是否出现异常增量。
+6. 如出现异常增量，先在 PR 记录依赖来源与拆分方案，再决定是否调整预算阈值。

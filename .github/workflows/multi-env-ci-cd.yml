@@ -47,6 +47,9 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
+  VITE_ENABLE_MOCK: 'false'
+  VITE_ENTRY_JS_BUDGET_KIB: '300'
+  VITE_ASYNC_CHUNK_BUDGET_KIB: '300'
 
 jobs:
   quality:
@@ -61,12 +64,51 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+      - &resolve_build_preset_step
+        name: Resolve build preset
+        run: |
+          PRESET="production"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.action }}" = "deploy" ]; then
+            case "${{ github.event.inputs.target }}" in
+              dev) PRESET="development" ;;
+              test) PRESET="test" ;;
+              stage) PRESET="stage" ;;
+              prod) PRESET="prod" ;;
+              all)
+                case "${{ github.ref }}" in
+                  refs/heads/develop) PRESET="development" ;;
+                  refs/heads/test) PRESET="test" ;;
+                  refs/heads/stage) PRESET="stage" ;;
+                  refs/heads/main|refs/tags/v*) PRESET="prod" ;;
+                esac
+                ;;
+            esac
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            case "${{ github.base_ref }}" in
+              develop) PRESET="development" ;;
+              test) PRESET="test" ;;
+              stage) PRESET="stage" ;;
+              main) PRESET="prod" ;;
+            esac
+          else
+            case "${{ github.ref }}" in
+              refs/heads/develop) PRESET="development" ;;
+              refs/heads/test) PRESET="test" ;;
+              refs/heads/stage) PRESET="stage" ;;
+              refs/heads/main|refs/tags/v*) PRESET="prod" ;;
+            esac
+          fi
+          echo "VITE_BUILD_PRESET=$PRESET" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm verify:api
       - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report-${{ github.sha }}
+          path: dist/bundle-report.html
 
   build_artifact:
     runs-on: ubuntu-latest
@@ -83,6 +125,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+      - <<: *resolve_build_preset_step
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - uses: actions/upload-artifact@v4

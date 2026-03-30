@@ -1,8 +1,8 @@
 import type { Router } from 'vue-router'
-import { createDynamicRoutes } from '@/features/auth/dynamic-routes'
 import type { UserRole } from '@/features/auth/store/useAuthStore'
 
-export function ensureDynamicRoutes(router: Router, roles: UserRole[]) {
+export async function ensureDynamicRoutes(router: Router, roles: UserRole[]) {
+  const { createDynamicRoutes } = await import('@/features/auth/dynamic-routes')
   const dynamicRoutes = createDynamicRoutes(roles)
   let added = false
 

@@ -15,11 +15,11 @@ export function resolveDocumentTitle(title: unknown) {
 }
 
 export function setupRouterGuards(router: Router) {
-  router.beforeEach((to) => {
+  router.beforeEach(async (to) => {
     const authStore = useAuthStore()
 
     if (authStore.isAuthenticated) {
-      const hasAddedRoute = ensureDynamicRoutes(router, authStore.roles)
+      const hasAddedRoute = await ensureDynamicRoutes(router, authStore.roles)
       if (to.name === 'not-found' && hasAddedRoute) {
         return to.fullPath
       }
@@ -27,6 +27,13 @@ export function setupRouterGuards(router: Router) {
 
     const routeName = to.name ? String(to.name) : ''
     const isPublicPage = isPublicRoute(routeName, to.meta.requiresAuth)
+
+    const isProtectedPath =
+      to.name === 'not-found' && (to.path.startsWith('/workspace') || to.path.startsWith('/admin'))
+
+    if (!authStore.isAuthenticated && isProtectedPath) {
+      return { name: 'home' }
+    }
 
     if (isPublicPage) {
       return true

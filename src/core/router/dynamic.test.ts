@@ -19,17 +19,17 @@ function createRouterStub(existingNames: string[] = []) {
 }
 
 describe('ensureDynamicRoutes', () => {
-  it('adds workspace and admin routes for admin role', () => {
+  it('adds workspace and admin routes for admin role', async () => {
     const router = createRouterStub()
-    const added = ensureDynamicRoutes(router as never, ['admin'])
+    const added = await ensureDynamicRoutes(router as never, ['admin'])
     expect(added).toBe(true)
     expect(router.added).toContain('workspace')
     expect(router.added).toContain('admin')
   })
 
-  it('does not add existing routes repeatedly', () => {
+  it('does not add existing routes repeatedly', async () => {
     const router = createRouterStub(['workspace'])
-    const added = ensureDynamicRoutes(router as never, ['editor'])
+    const added = await ensureDynamicRoutes(router as never, ['editor'])
     expect(added).toBe(false)
     expect(router.added).toHaveLength(0)
   })

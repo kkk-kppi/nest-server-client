@@ -1,7 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
 import type { UserRole } from './store/useAuthStore'
-import WorkspaceView from '@/features/workspace/views/WorkspaceView.vue'
-import AdminView from '@/features/admin/views/AdminView.vue'
 
 function getRoleRoutes(role: UserRole): RouteRecordRaw[] {
   if (role === 'admin') {
@@ -9,7 +7,7 @@ function getRoleRoutes(role: UserRole): RouteRecordRaw[] {
       {
         path: '/workspace',
         name: 'workspace',
-        component: WorkspaceView,
+        component: () => import('@/features/workspace/views/WorkspaceView.vue'),
         meta: {
           title: 'Workspace',
           requiresAuth: true,
@@ -20,7 +18,7 @@ function getRoleRoutes(role: UserRole): RouteRecordRaw[] {
       {
         path: '/admin',
         name: 'admin',
-        component: AdminView,
+        component: () => import('@/features/admin/views/AdminView.vue'),
         meta: {
           title: 'Admin',
           requiresAuth: true,
@@ -36,7 +34,7 @@ function getRoleRoutes(role: UserRole): RouteRecordRaw[] {
       {
         path: '/workspace',
         name: 'workspace',
-        component: WorkspaceView,
+        component: () => import('@/features/workspace/views/WorkspaceView.vue'),
         meta: {
           title: 'Workspace',
           requiresAuth: true,
@@ -51,7 +49,7 @@ function getRoleRoutes(role: UserRole): RouteRecordRaw[] {
     {
       path: '/workspace',
       name: 'workspace',
-      component: WorkspaceView,
+      component: () => import('@/features/workspace/views/WorkspaceView.vue'),
       meta: {
         title: 'Workspace',
         requiresAuth: true,

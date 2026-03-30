@@ -13,6 +13,7 @@
 
 - [企业级前端架构路线图](./doc/企业级前端架构路线图.md)
 - [Docker 部署与运行指南](./doc/Docker部署与运行指南.md)
+- [Vite 分包策略与性能预算治理](./doc/Vite分包策略与性能预算治理.md)
 - [API MOCK 指南和接入说明](./doc/API%20MOCK指南和接入说明.md)
 - [E2E 测试与接入指南](./doc/E2E测试与接入指南.md)
 - [环境变量提交规范](./doc/环境变量提交规范.md)
@@ -255,6 +256,7 @@ nest-server-client/
 │  └─ settings.json
 ├─ doc/
 │  ├─ Docker部署与运行指南.md
+│  ├─ Vite分包策略与性能预算治理.md
 │  ├─ API MOCK指南和接入说明.md
 │  ├─ E2E测试与接入指南.md
 │  ├─ 企业级前端架构路线图.md
