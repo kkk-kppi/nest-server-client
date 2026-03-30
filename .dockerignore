@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+cypress
+.git
+.github
+.husky
+.vscode
+doc
+*.log
+.env
+.env.*
+!.env.example
+README.md

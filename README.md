@@ -9,6 +9,15 @@
 
 应用入口由 `src/main.ts` 调用 `src/app/bootstrap.ts`，挂载 `src/app/AppRoot.vue`，并通过 `vue-router + pinia` 组装业务页面。
 
+## 相关文档入口
+
+- [企业级前端架构路线图](./doc/企业级前端架构路线图.md)
+- [Docker 部署与运行指南](./doc/Docker部署与运行指南.md)
+- [API MOCK 指南和接入说明](./doc/API%20MOCK指南和接入说明.md)
+- [E2E 测试与接入指南](./doc/E2E测试与接入指南.md)
+- [环境变量提交规范](./doc/环境变量提交规范.md)
+- [分支规范文档](./doc/分支规范文档.md)
+
 ## 技术栈与架构
 
 - **框架**：Vue 3 (`vue`)
@@ -245,6 +254,9 @@ nest-server-client/
 │  ├─ extensions.json
 │  └─ settings.json
 ├─ doc/
+│  ├─ Docker部署与运行指南.md
+│  ├─ API MOCK指南和接入说明.md
+│  ├─ E2E测试与接入指南.md
 │  ├─ 企业级前端架构路线图.md
 │  ├─ 分支规范文档.md
 │  └─ 环境变量提交规范.md
