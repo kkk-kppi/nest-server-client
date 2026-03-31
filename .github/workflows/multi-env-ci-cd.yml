@@ -40,6 +40,11 @@ on:
         type: string
         description: rollback version tag or release id
         required: false
+      dry_run:
+        type: boolean
+        description: validate workflow without executing deploy/rollback commands
+        required: true
+        default: true
 
 concurrency:
   group: multi-env-ci-cd-${{ github.ref }}
@@ -146,6 +151,10 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run enabled. Skip DEV_DEPLOY_COMMAND execution."
+            exit 0
+          fi
           if [ -z "${{ secrets.DEV_DEPLOY_COMMAND }}" ]; then
             echo "DEV_DEPLOY_COMMAND is not configured."
             exit 1
@@ -165,6 +174,10 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run enabled. Skip TEST_DEPLOY_COMMAND execution."
+            exit 0
+          fi
           if [ -z "${{ secrets.TEST_DEPLOY_COMMAND }}" ]; then
             echo "TEST_DEPLOY_COMMAND is not configured."
             exit 1
@@ -184,6 +197,10 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run enabled. Skip STAGE_DEPLOY_COMMAND execution."
+            exit 0
+          fi
           if [ -z "${{ secrets.STAGE_DEPLOY_COMMAND }}" ]; then
             echo "STAGE_DEPLOY_COMMAND is not configured."
             exit 1
@@ -203,6 +220,10 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
       - run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run enabled. Skip PROD_DEPLOY_COMMAND execution."
+            exit 0
+          fi
           if [ -z "${{ secrets.PROD_DEPLOY_COMMAND }}" ]; then
             echo "PROD_DEPLOY_COMMAND is not configured."
             exit 1
@@ -215,6 +236,10 @@ jobs:
     environment: ${{ github.event.inputs.target }}
     steps:
       - run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run enabled. Skip rollback command execution."
+            exit 0
+          fi
           TARGET="${{ github.event.inputs.target }}"
           if [ "$TARGET" = "all" ]; then
             echo "Rollback does not support target=all. Please choose a single environment."

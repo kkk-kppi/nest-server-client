@@ -36,8 +36,10 @@
 
 - 支持 `action` 选择：`deploy` / `rollback`
 - 支持 `target` 选择：`dev` / `test` / `stage` / `prod` / `all`
+- 支持 `dry_run`：`true/false`（默认 `true`）
 - `action=deploy`：执行质量门禁与构建产物，再按目标环境执行部署 job
 - `action=rollback`：执行指定环境回滚 job（需选择单环境 target，且可传 `rollback_version`）
+- `dry_run=true`：仅验收流水线链路，不执行真实部署/回滚命令
 
 ---
 
@@ -89,6 +91,7 @@
 
 - 按分支或手动目标触发
 - 从 artifact 下载 `dist` 后执行对应部署命令
+- `workflow_dispatch` 且 `dry_run=true` 时，仅输出模拟执行日志并跳过命令
 - 部署命令通过 GitHub Secrets 注入，未配置会直接失败并阻断发布
 
 ### 4.4 rollback
@@ -96,6 +99,7 @@
 - 仅在 `workflow_dispatch` 且 `action=rollback` 时触发
 - 根据 `target` 选择执行对应环境回滚命令
 - 可通过 `rollback_version` 传入回滚版本（供回滚命令读取）
+- `dry_run=true` 时仅验证路由与参数，不执行真实回滚命令
 
 ---
 
@@ -189,8 +193,19 @@ PR 仅做质量验证，避免预览分支误发版。部署仅在 push 到环�
 - `action=rollback`
 - `target=dev|test|stage|prod`（不支持 all）
 - `rollback_version`（按你的回滚脚本约定填写）
+- `dry_run`：验收链路用 `true`，真实回滚用 `false`
 
-### 9.5 如何排查 `VITE_BUILD_PRESET` 与预期不一致
+### 9.5 如何做 CI/CD 验收闭环（不触发真实发布）
+
+在 Actions 页面手动触发 `multi-env-ci-cd`：
+
+1. 选择 `action=deploy`
+2. `target=all`
+3. `dry_run=true`
+4. 观察 `quality -> build_artifact -> deploy_*` 全链路为成功
+5. 校验日志包含 `Dry run enabled`，确认未执行真实部署命令
+
+### 9.6 如何排查 `VITE_BUILD_PRESET` 与预期不一致
 
 按以下顺序定位：
 
