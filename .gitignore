@@ -31,3 +31,9 @@ cypress/downloads
 *.njsproj
 *.sln
 *.sw?
+
+# OpenCode
+opencode.json
+
+# Storybook
+storybook-static
