@@ -237,3 +237,28 @@ PR 仅做质量验证，避免预览分支误发版。部署仅在 push 到环�
 4. 解压后打开 `bundle-report.html`，核对入口静态链路体积是否仍在预算线内。
 5. 对照基线重点关注 `framework-routing-state`、`framework-http`、`vendor` 是否出现异常增量。
 6. 如出现异常增量，先在 PR 记录依赖来源与拆分方案，再决定是否调整预算阈值。
+
+---
+
+## 12. 环境命令 Secrets 配置
+
+在 GitHub 仓库 Settings → Secrets and variables → Actions 中配置以下 Secrets：
+
+| Secret 名称              | 所属环境 | 用途             |
+| ------------------------ | -------- | ---------------- |
+| `DEV_DEPLOY_COMMAND`     | dev      | 开发环境部署命令 |
+| `DEV_ROLLBACK_COMMAND`   | dev      | 开发环境回滚命令 |
+| `TEST_DEPLOY_COMMAND`    | test     | 测试环境部署命令 |
+| `TEST_ROLLBACK_COMMAND`  | test     | 测试环境回滚命令 |
+| `STAGE_DEPLOY_COMMAND`   | stage    | 预发环境部署命令 |
+| `STAGE_ROLLBACK_COMMAND` | stage    | 预发环境回滚命令 |
+| `PROD_DEPLOY_COMMAND`    | prod     | 生产环境部署命令 |
+| `PROD_ROLLBACK_COMMAND`  | prod     | 生产环境回滚命令 |
+
+### 验证方式
+
+使用 `workflow_dispatch` + `dry_run=true` 验证流水线链路：
+
+1. 进入 Actions → multi-env-ci-cd → Run workflow
+2. 选择 action=deploy, target=all, dry_run=true
+3. 观察 quality → build*artifact → deploy*\* 全链路通过
