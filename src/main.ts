@@ -6,7 +6,7 @@ async function startApp() {
     const { enableMocking } = await import('./mocks/browser')
     await enableMocking()
   }
-  bootstrap()
+  await bootstrap()
 }
 
 void startApp()
