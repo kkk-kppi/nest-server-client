@@ -10,7 +10,7 @@ import {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const entryBudgetKib = Number(env.VITE_ENTRY_JS_BUDGET_KIB ?? 300)
-  const asyncBudgetKib = Number(env.VITE_ASYNC_CHUNK_BUDGET_KIB ?? 300)
+  const asyncBudgetKib = Number(env.VITE_ASYNC_CHUNK_BUDGET_KIB ?? 500)
   const runtimeOptions = resolveBuildRuntimeOptions(mode, env)
   const plugins = [
     vue(),

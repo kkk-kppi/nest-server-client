@@ -83,6 +83,16 @@ function createManualChunksResolver(strategy: ChunkStrategy) {
     if (normalizedId.includes('/msw/') || normalizedId.includes('/@mswjs/')) {
       return 'mock-vendor'
     }
+    if (
+      normalizedId.includes('/@sentry/') ||
+      normalizedId.includes('/@sentry-') ||
+      normalizedId.includes('/sentry/')
+    ) {
+      return 'vendor-sentry'
+    }
+    if (normalizedId.includes('/web-vitals/')) {
+      return 'vendor-web-vitals'
+    }
     if (normalizedId.includes('/vue/')) {
       return 'framework-vue'
     }
