@@ -124,3 +124,36 @@ pnpm build
 - 新增重型依赖时优先按功能路由隔离，避免并入首屏静态链路
 - 公共能力优先复用现有依赖，避免重复引入同类库
 - 调整预算阈值前先给出本次变更理由和对比数据，再同步更新本文件基线
+
+## Stage 环境验收清单
+
+### 前置条件
+
+- [ ] CI/CD STAGE_DEPLOY_COMMAND 已配置
+- [ ] Stage 环境可访问
+
+### 验收步骤
+
+1. **触发 stage 构建**
+   - 推送到 stage 分支: `git push origin HEAD:stage`
+   - 或手动触发: Actions → multi-env-ci-cd → Run workflow → target=stage
+
+2. **检查构建产物**
+   - [ ] `dist/bundle-report.html` 已上传为 artifact
+   - [ ] 入口 JS 总大小 ≤ 300 KiB
+   - [ ] 异步 chunk 单个 ≤ 300 KiB
+   - [ ] mock-vendor 已从首屏分离
+
+3. **运行时验证**
+   - [ ] 首屏加载 LCP ≤ 2.5s（Chrome DevTools → Performance）
+   - [ ] 路由切换懒加载正常
+   - [ ] 分页功能（workspace/admin）正常
+   - [ ] 登录/登出/权限拦截正常
+
+4. **性能指标记录**
+
+   | 指标           | 目标值    | 实测值 | 是否达标 |
+   | -------------- | --------- | ------ | -------- |
+   | 入口 JS (gzip) | ≤ 300 KiB |        |          |
+   | LCP            | ≤ 2.5s    |        |          |
+   | FCP            | ≤ 1.8s    |        |          |
