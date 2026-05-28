@@ -21,5 +21,10 @@ export function bootstrap() {
     router.replace({ name: 'home' })
   })
 
+  app.config.errorHandler = (err, _instance, info) => {
+    console.error('[Global Error]', err, info)
+    // 后续接入 Sentry 时在此上报
+  }
+
   app.mount('#app')
 }
