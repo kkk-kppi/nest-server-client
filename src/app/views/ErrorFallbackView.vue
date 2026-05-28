@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="error-fallback">
+  <main class="error-fallback">
     <h1>页面出错了</h1>
     <p>抱歉，页面渲染过程中发生了错误，请尝试刷新页面。</p>
     <details v-if="error">
@@ -17,7 +17,7 @@ defineProps<{
       <button v-if="resetError" type="button" @click="resetError">重试</button>
       <router-link to="/">返回首页</router-link>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
@@ -32,11 +32,12 @@ defineProps<{
 h1 {
   margin: 0;
   font-size: 2rem;
+  color: var(--text-h);
 }
 
 p {
   margin: 1rem 0;
-  color: #666;
+  color: var(--text);
 }
 
 details {
@@ -46,7 +47,7 @@ details {
 
 pre {
   padding: 1rem;
-  background: #f5f5f5;
+  background: var(--code-bg);
   border-radius: 4px;
   overflow-x: auto;
 }
@@ -59,19 +60,20 @@ pre {
 
 button {
   padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background: #fff;
+  background: transparent;
+  color: var(--text-h);
   cursor: pointer;
 }
 
 button:hover {
-  background: #f0f0f0;
+  background: var(--accent-bg);
 }
 
 a {
   padding: 0.5rem 1rem;
-  color: #0066cc;
+  color: var(--accent);
   text-decoration: none;
 }
 
