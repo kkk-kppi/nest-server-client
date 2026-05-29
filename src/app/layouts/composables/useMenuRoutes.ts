@@ -33,21 +33,6 @@ function renderIcon(iconName: string) {
   return () => h(NIcon, null, { default: () => h(iconComponent) })
 }
 
-function shouldShowRoute(route: RouteRecordRaw): boolean {
-  const meta = route.meta as Record<string, unknown> | undefined
-  if (meta?.hidden) return false
-  if (route.name === 'login' || route.name === 'forbidden' || route.name === 'not-found')
-    return false
-
-  if (route.name) return true
-
-  if (route.children?.length) {
-    return route.children.some((child) => shouldShowRoute(child))
-  }
-
-  return false
-}
-
 function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
   const meta = route.meta as Record<string, unknown> | undefined
   if (meta?.hidden) return null
@@ -73,7 +58,16 @@ export function useMenuRoutes() {
 
   const menuOptions = computed<MenuOption[]>(() => {
     const routes = router.getRoutes()
-    return routes.filter(shouldShowRoute).map(routeToMenuOption).filter(Boolean) as MenuOption[]
+    // 只处理顶级路由（path 不为空的路由），子路由由父路由递归处理
+    const topRoutes = routes.filter((r) => {
+      const meta = r.meta as Record<string, unknown> | undefined
+      if (meta?.hidden) return false
+      if (r.name === 'login' || r.name === 'forbidden' || r.name === 'not-found') return false
+      // 子路由的 path 为空字符串，跳过
+      if (r.path === '' || r.path === '/') return false
+      return true
+    })
+    return topRoutes.map(routeToMenuOption).filter(Boolean) as MenuOption[]
   })
 
   return { menuOptions }
