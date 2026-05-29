@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import AppRoot from './AppRoot.vue'
 import { createStore } from '@/core/store'
 import { createAppRouter } from '@/core/router'
+import { i18n } from '@/core/i18n'
 import { setAccessTokenGetter, setUnauthorizedHandler } from '@/core/http'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import { initObservability } from '@/core/observability'
@@ -13,6 +14,7 @@ export async function bootstrap() {
   const router = createAppRouter()
   app.use(store)
   app.use(router)
+  app.use(i18n)
 
   const authStore = useAuthStore()
   setAccessTokenGetter(() => authStore.accessToken)
