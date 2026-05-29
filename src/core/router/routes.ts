@@ -32,22 +32,18 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/app/views/DashboardView.vue'),
         meta: { title: '仪表盘', icon: 'GridOutline', order: 0, requiresAuth: true },
       },
+      {
+        path: '/forbidden',
+        name: 'forbidden',
+        component: () => import('@/app/views/ForbiddenView.vue'),
+        meta: { title: 'Forbidden', hidden: true },
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/app/views/NotFoundView.vue'),
+        meta: { title: 'Not Found', hidden: true },
+      },
     ],
-  },
-  {
-    path: '/forbidden',
-    name: 'forbidden',
-    component: () => import('@/app/views/ForbiddenView.vue'),
-    meta: {
-      title: 'Forbidden',
-    },
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    component: () => import('@/app/views/NotFoundView.vue'),
-    meta: {
-      title: 'Not Found',
-    },
   },
 ]
