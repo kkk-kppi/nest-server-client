@@ -1,6 +1,9 @@
 import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import {
   createBundleBudgetPlugin,
   createBundleReportPlugin,
@@ -14,6 +17,18 @@ export default defineConfig(({ mode }) => {
   const runtimeOptions = resolveBuildRuntimeOptions(mode, env)
   const plugins = [
     vue(),
+    AutoImport({
+      imports: [
+        'vue',
+        'vue-router',
+        { 'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar'] },
+      ],
+      dts: 'src/auto-imports.d.ts',
+    }),
+    Components({
+      resolvers: [NaiveUiResolver()],
+      dts: 'src/components.d.ts',
+    }),
     createBundleBudgetPlugin(entryBudgetKib, asyncBudgetKib),
     ...(runtimeOptions.enableBundleReport ? [createBundleReportPlugin()] : []),
   ]
