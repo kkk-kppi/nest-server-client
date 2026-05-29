@@ -11,6 +11,8 @@ import {
   BookOutline,
   HomeOutline,
   FolderOutline,
+  FolderOpenOutline,
+  ConstructOutline,
 } from '@vicons/ionicons5'
 
 const iconMap: Record<string, Component> = {
@@ -21,6 +23,8 @@ const iconMap: Record<string, Component> = {
   BookOutline,
   HomeOutline,
   FolderOutline,
+  FolderOpenOutline,
+  ConstructOutline,
 }
 
 function renderIcon(iconName: string) {
@@ -55,8 +59,13 @@ export function useMenuRoutes() {
     return routes
       .filter((r) => {
         const meta = r.meta as Record<string, unknown> | undefined
+        // 只显示有 name 的路由（实际页面），过滤掉布局包装路由和隐藏路由
         return (
-          !meta?.hidden && r.name !== 'login' && r.name !== 'forbidden' && r.name !== 'not-found'
+          r.name &&
+          !meta?.hidden &&
+          r.name !== 'login' &&
+          r.name !== 'forbidden' &&
+          r.name !== 'not-found'
         )
       })
       .map(routeToMenuOption)

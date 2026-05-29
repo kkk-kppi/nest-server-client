@@ -22,6 +22,8 @@ export {
   ChevronDownOutline,
   HomeOutline,
   FolderOutline,
+  FolderOpenOutline,
+  ConstructOutline,
   DocumentOutline,
   CalendarOutline,
   TimeOutline,
