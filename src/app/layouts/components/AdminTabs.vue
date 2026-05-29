@@ -30,6 +30,8 @@ function handleTabChange(name: string) {
 }
 
 function handleClose(name: string) {
+  if (tabs.value.length <= 1) return
+
   const index = tabs.value.findIndex((t) => t.name === name)
   if (index === -1) return
 
@@ -46,16 +48,11 @@ function handleClose(name: string) {
   <n-tabs
     :value="activeTab"
     type="card"
+    closable
     style="padding: 4px 0"
     @update:value="handleTabChange"
     @close="handleClose"
   >
-    <n-tab
-      v-for="tab in tabs"
-      :key="tab.name"
-      :name="tab.name"
-      :tab="tab.title"
-      :closable="tabs.length > 1"
-    />
+    <n-tab v-for="tab in tabs" :key="tab.name" :name="tab.name" :tab="tab.title" />
   </n-tabs>
 </template>
