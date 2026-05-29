@@ -1,5 +1,5 @@
 import { h, computed } from 'vue'
-import { useRouter, type RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import type { Component } from 'vue'
@@ -14,6 +14,9 @@ import {
   FolderOpenOutline,
   ConstructOutline,
 } from '@vicons/ionicons5'
+import { routes as staticRoutes } from '@/core/router/routes'
+import { createDynamicRoutes } from '@/features/auth/dynamic-routes'
+import { useAuthStore } from '@/features/auth/store/useAuthStore'
 
 const iconMap: Record<string, Component> = {
   GridOutline,
@@ -54,20 +57,14 @@ function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
 }
 
 export function useMenuRoutes() {
-  const router = useRouter()
+  const authStore = useAuthStore()
 
   const menuOptions = computed<MenuOption[]>(() => {
-    const routes = router.getRoutes()
-    // 只处理顶级路由（path 不为空的路由），子路由由父路由递归处理
-    const topRoutes = routes.filter((r) => {
-      const meta = r.meta as Record<string, unknown> | undefined
-      if (meta?.hidden) return false
-      if (r.name === 'login' || r.name === 'forbidden' || r.name === 'not-found') return false
-      // 子路由的 path 为空字符串，跳过
-      if (r.path === '' || r.path === '/') return false
-      return true
-    })
-    return topRoutes.map(routeToMenuOption).filter(Boolean) as MenuOption[]
+    // 使用原始路由定义，避免 router.getRoutes() 返回扁平化数据导致重复
+    const dynamicRoutes = createDynamicRoutes(authStore.roles)
+    const allRoutes = [...staticRoutes, ...dynamicRoutes]
+
+    return allRoutes.map(routeToMenuOption).filter(Boolean) as MenuOption[]
   })
 
   return { menuOptions }
