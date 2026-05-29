@@ -6,11 +6,13 @@ import {
   ExpandOutline,
   ContractOutline,
   SettingsOutline,
+  MenuOutline,
 } from '@vicons/ionicons5'
 import { useTheme } from '@/core/theme/useTheme'
 import { useLayoutSetting } from '@/core/theme/useLayoutSetting'
 import AdminBreadcrumb from './AdminBreadcrumb.vue'
 import AdminUserMenu from './AdminUserMenu.vue'
+import AdminSettingPanel from './AdminSettingPanel.vue'
 
 defineProps<{
   layoutMode: 'side' | 'top' | 'mix'
@@ -20,6 +22,7 @@ const { isDark, toggleDark } = useTheme()
 const { toggleSidebar } = useLayoutSetting()
 
 const isFullscreen = ref(false)
+const showSettingPanel = ref(false)
 
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -38,7 +41,7 @@ function toggleFullscreen() {
       <n-button quaternary circle @click="toggleSidebar">
         <template #icon>
           <n-icon :size="20">
-            <SettingsOutline />
+            <MenuOutline />
           </n-icon>
         </template>
       </n-button>
@@ -64,7 +67,17 @@ function toggleFullscreen() {
         </template>
       </n-button>
 
+      <n-button quaternary circle @click="showSettingPanel = true">
+        <template #icon>
+          <n-icon :size="18">
+            <SettingsOutline />
+          </n-icon>
+        </template>
+      </n-button>
+
       <AdminUserMenu />
     </n-space>
   </div>
+
+  <AdminSettingPanel v-model:show="showSettingPanel" />
 </template>
