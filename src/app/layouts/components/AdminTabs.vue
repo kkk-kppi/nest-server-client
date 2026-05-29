@@ -46,11 +46,16 @@ function handleClose(name: string) {
   <n-tabs
     :value="activeTab"
     type="card"
-    closable
     style="padding: 4px 0"
     @update:value="handleTabChange"
     @close="handleClose"
   >
-    <n-tab v-for="tab in tabs" :key="tab.name" :name="tab.name" :tab="tab.title" />
+    <n-tab
+      v-for="tab in tabs"
+      :key="tab.name"
+      :name="tab.name"
+      :tab="tab.title"
+      :closable="tabs.length > 1"
+    />
   </n-tabs>
 </template>
