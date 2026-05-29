@@ -3,7 +3,7 @@ import { canAccess } from '@/features/auth/permission'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import { ensureDynamicRoutes } from './dynamic'
 
-const AUTH_WHITELIST = new Set(['home', 'forbidden', 'not-found'])
+const AUTH_WHITELIST = new Set(['login', 'forbidden', 'not-found'])
 
 export function isPublicRoute(routeName: string, requiresAuth: boolean | undefined) {
   const isWhitelisted = AUTH_WHITELIST.has(routeName)
@@ -32,7 +32,7 @@ export function setupRouterGuards(router: Router) {
       to.name === 'not-found' && (to.path.startsWith('/workspace') || to.path.startsWith('/admin'))
 
     if (!authStore.isAuthenticated && isProtectedPath) {
-      return { name: 'home' }
+      return { name: 'login' }
     }
 
     if (isPublicPage) {
@@ -40,7 +40,7 @@ export function setupRouterGuards(router: Router) {
     }
 
     if (!authStore.isAuthenticated) {
-      return { name: 'home' }
+      return { name: 'login' }
     }
 
     const pass = canAccess(authStore.roles, authStore.permissions, to.meta)

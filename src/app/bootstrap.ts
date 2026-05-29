@@ -21,7 +21,7 @@ export async function bootstrap() {
   setUnauthorizedHandler(() => {
     authStore.clearSession()
     authStore.setAuthNotice('登录状态已失效，请重新登录')
-    router.replace({ name: 'home' })
+    router.replace({ name: 'login' })
   })
 
   app.config.errorHandler = (err, _instance, info) => {

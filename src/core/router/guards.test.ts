@@ -3,7 +3,7 @@ import { isPublicRoute, resolveDocumentTitle } from './guards'
 
 describe('isPublicRoute', () => {
   it('returns true for whitelist route', () => {
-    expect(isPublicRoute('home', true)).toBe(true)
+    expect(isPublicRoute('login', true)).toBe(true)
   })
 
   it('returns true for route without requiresAuth', () => {
