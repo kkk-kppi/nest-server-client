@@ -3,6 +3,7 @@ interface AppEnv {
   apiBaseUrl: string
   sentryDsn: string
   enableMock: boolean
+  routeMode: 'frontend' | 'backend'
 }
 
 const env = import.meta.env
@@ -19,4 +20,5 @@ export const appEnv: AppEnv = {
   apiBaseUrl: env.VITE_API_BASE_URL ?? 'http://localhost:3000',
   sentryDsn: env.VITE_SENTRY_DSN ?? '',
   enableMock: resolveBooleanEnv(env.VITE_ENABLE_MOCK, false),
+  routeMode: (env.VITE_ROUTE_MODE as 'frontend' | 'backend') ?? 'frontend',
 }

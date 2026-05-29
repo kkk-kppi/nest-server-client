@@ -1,5 +1,6 @@
 import {
   definePostEndpoint,
+  defineGetEndpoint,
   requestEndpoint,
   type InferEndpointRequest,
   type InferEndpointResponse,
@@ -24,6 +25,36 @@ export type LoginResult = InferEndpointResponse<typeof loginByRoleEndpoint>
 export async function loginByRole(payload: LoginPayload) {
   return requestEndpoint(loginByRoleEndpoint, {
     payload,
+    config: {
+      timeout: 8000,
+    },
+  })
+}
+
+// 路由配置接口
+export interface RouteConfig {
+  path: string
+  name?: string
+  component?: string
+  redirect?: string
+  meta?: {
+    title: string
+    icon?: string
+    hidden?: boolean
+    order?: number
+    requiresAuth?: boolean
+    roles?: string[]
+    permissions?: string[]
+  }
+  children?: RouteConfig[]
+}
+
+export const getRoutesEndpoint = defineGetEndpoint<'/api/auth/routes', RouteConfig[]>(
+  '/api/auth/routes',
+)
+
+export async function getRoutes() {
+  return requestEndpoint(getRoutesEndpoint, {
     config: {
       timeout: 8000,
     },

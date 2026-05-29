@@ -1,4 +1,4 @@
-import { h, computed } from 'vue'
+import { h, ref, watchEffect } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
@@ -14,9 +14,8 @@ import {
   FolderOpenOutline,
   ConstructOutline,
 } from '@vicons/ionicons5'
-import { routes as staticRoutes } from '@/core/router/routes'
-import { createDynamicRoutes } from '@/features/auth/dynamic-routes'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
+import { getAllRoutes } from '@/core/router/route-mode'
 
 const iconMap: Record<string, Component> = {
   GridOutline,
@@ -58,13 +57,16 @@ function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
 
 export function useMenuRoutes() {
   const authStore = useAuthStore()
+  const menuOptions = ref<MenuOption[]>([])
 
-  const menuOptions = computed<MenuOption[]>(() => {
-    // 使用原始路由定义，避免 router.getRoutes() 返回扁平化数据导致重复
-    const dynamicRoutes = createDynamicRoutes(authStore.roles)
-    const allRoutes = [...staticRoutes, ...dynamicRoutes]
-
-    return allRoutes.map(routeToMenuOption).filter(Boolean) as MenuOption[]
+  watchEffect(async () => {
+    try {
+      const allRoutes = await getAllRoutes(authStore.roles)
+      menuOptions.value = allRoutes.map(routeToMenuOption).filter(Boolean) as MenuOption[]
+    } catch (error) {
+      console.error('[useMenuRoutes] Failed to load routes:', error)
+      menuOptions.value = []
+    }
   })
 
   return { menuOptions }

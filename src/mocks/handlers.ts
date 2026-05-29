@@ -336,4 +336,109 @@ export const handlers = [
     const items = dictData.filter((d) => d.typeCode === typeCode)
     return HttpResponse.json(items)
   }),
+  // 路由配置接口（后端模式）
+  http.get(resolveMockPath('/api/auth/routes'), () => {
+    return HttpResponse.json([
+      {
+        path: '/dashboard',
+        component: 'AdminLayout',
+        children: [
+          {
+            path: '',
+            name: 'dashboard',
+            component: 'DashboardView',
+            meta: { title: '仪表盘', icon: 'GridOutline', order: 0, requiresAuth: true },
+          },
+        ],
+      },
+      {
+        path: '/workspace',
+        component: 'AdminLayout',
+        children: [
+          {
+            path: '',
+            name: 'workspace',
+            component: 'WorkspaceView',
+            meta: {
+              title: '工作空间',
+              icon: 'FolderOpenOutline',
+              order: 1,
+              requiresAuth: true,
+              roles: ['admin', 'editor', 'viewer'],
+              permissions: ['workspace:read'],
+            },
+          },
+        ],
+      },
+      {
+        path: '/admin',
+        component: 'AdminLayout',
+        children: [
+          {
+            path: '',
+            name: 'admin',
+            component: 'AdminView',
+            meta: {
+              title: '管理面板',
+              icon: 'ConstructOutline',
+              order: 2,
+              requiresAuth: true,
+              roles: ['admin'],
+              permissions: ['admin:read'],
+            },
+          },
+        ],
+      },
+      {
+        path: '/system',
+        component: 'AdminLayout',
+        meta: {
+          title: '系统管理',
+          icon: 'SettingsOutline',
+          order: 99,
+          requiresAuth: true,
+          roles: ['admin'],
+          permissions: ['admin:read'],
+        },
+        children: [
+          {
+            path: 'user',
+            name: 'system-user',
+            component: 'UserManageView',
+            meta: {
+              title: '用户管理',
+              icon: 'PeopleOutline',
+              requiresAuth: true,
+              roles: ['admin'],
+              permissions: ['admin:read'],
+            },
+          },
+          {
+            path: 'role',
+            name: 'system-role',
+            component: 'RoleManageView',
+            meta: {
+              title: '角色管理',
+              icon: 'ShieldOutline',
+              requiresAuth: true,
+              roles: ['admin'],
+              permissions: ['admin:read'],
+            },
+          },
+          {
+            path: 'dict',
+            name: 'system-dict',
+            component: 'DictManageView',
+            meta: {
+              title: '字典管理',
+              icon: 'BookOutline',
+              requiresAuth: true,
+              roles: ['admin'],
+              permissions: ['admin:read'],
+            },
+          },
+        ],
+      },
+    ])
+  }),
 ]
