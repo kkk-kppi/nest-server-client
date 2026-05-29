@@ -2,6 +2,8 @@ export { http } from './client'
 export {
   defineGetEndpoint,
   definePostEndpoint,
+  definePutEndpoint,
+  defineDeleteEndpoint,
   requestEndpoint,
 } from './endpoint'
 export { del, get, patch, post, put, request, toAppHttpError } from './request'

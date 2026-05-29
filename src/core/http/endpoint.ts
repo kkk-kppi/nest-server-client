@@ -52,6 +52,24 @@ export function definePostEndpoint<TPath extends string, TResponse, TBody = void
   } as const satisfies ApiEndpoint<'post', TPath, TBody, TResponse>
 }
 
+export function definePutEndpoint<TPath extends string, TResponse, TBody = void>(path: TPath) {
+  return {
+    method: 'put',
+    path,
+    request: undefined as TBody,
+    response: undefined as TResponse,
+  } as const satisfies ApiEndpoint<'put', TPath, TBody, TResponse>
+}
+
+export function defineDeleteEndpoint<TPath extends string, TResponse = void>(path: TPath) {
+  return {
+    method: 'delete',
+    path,
+    request: undefined as void,
+    response: undefined as TResponse,
+  } as const satisfies ApiEndpoint<'delete', TPath, void, TResponse>
+}
+
 export async function requestEndpoint<
   TEndpoint extends ApiEndpoint<HttpMethod, string, unknown, unknown>,
 >(endpoint: TEndpoint, options?: EndpointCallOptions<TEndpoint>) {
