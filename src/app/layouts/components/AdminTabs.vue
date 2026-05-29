@@ -13,12 +13,13 @@ interface TabItem {
 
 const tabs = ref<TabItem[]>([])
 const activeTab = ref('')
+const closedTabs = new Set<string>()
 
 watchEffect(() => {
   const routeName = route.name as string
   const routeTitle = (route.meta?.title as string) || routeName
 
-  if (routeName && !tabs.value.find((t) => t.name === routeName)) {
+  if (routeName && !closedTabs.has(routeName) && !tabs.value.find((t) => t.name === routeName)) {
     tabs.value.push({ name: routeName, title: routeTitle, path: route.fullPath })
   }
   activeTab.value = routeName
@@ -36,6 +37,7 @@ function handleClose(name: string) {
   if (index === -1) return
 
   tabs.value.splice(index, 1)
+  closedTabs.add(name)
 
   if (name === activeTab.value) {
     const nextTab = tabs.value[Math.min(index, tabs.value.length - 1)]
