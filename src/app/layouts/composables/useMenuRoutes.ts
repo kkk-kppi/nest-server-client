@@ -33,6 +33,21 @@ function renderIcon(iconName: string) {
   return () => h(NIcon, null, { default: () => h(iconComponent) })
 }
 
+function shouldShowRoute(route: RouteRecordRaw): boolean {
+  const meta = route.meta as Record<string, unknown> | undefined
+  if (meta?.hidden) return false
+  if (route.name === 'login' || route.name === 'forbidden' || route.name === 'not-found')
+    return false
+
+  if (route.name) return true
+
+  if (route.children?.length) {
+    return route.children.some((child) => shouldShowRoute(child))
+  }
+
+  return false
+}
+
 function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
   const meta = route.meta as Record<string, unknown> | undefined
   if (meta?.hidden) return null
@@ -42,6 +57,8 @@ function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
   if (children.length === 1 && !children[0].children?.length) {
     return children[0]
   }
+
+  if (!route.name && children.length === 0) return null
 
   return {
     label: (meta?.title as string) || (route.name as string) || '',
@@ -56,20 +73,7 @@ export function useMenuRoutes() {
 
   const menuOptions = computed<MenuOption[]>(() => {
     const routes = router.getRoutes()
-    return routes
-      .filter((r) => {
-        const meta = r.meta as Record<string, unknown> | undefined
-        // 只显示有 name 的路由（实际页面），过滤掉布局包装路由和隐藏路由
-        return (
-          r.name &&
-          !meta?.hidden &&
-          r.name !== 'login' &&
-          r.name !== 'forbidden' &&
-          r.name !== 'not-found'
-        )
-      })
-      .map(routeToMenuOption)
-      .filter(Boolean) as MenuOption[]
+    return routes.filter(shouldShowRoute).map(routeToMenuOption).filter(Boolean) as MenuOption[]
   })
 
   return { menuOptions }
