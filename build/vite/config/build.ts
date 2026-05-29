@@ -93,6 +93,9 @@ function createManualChunksResolver(strategy: ChunkStrategy) {
     if (normalizedId.includes('/web-vitals/')) {
       return 'vendor-web-vitals'
     }
+    if (normalizedId.includes('/naive-ui/') || normalizedId.includes('/@css-render/')) {
+      return 'vendor-naive-ui'
+    }
     if (normalizedId.includes('/vue/')) {
       return 'framework-vue'
     }
