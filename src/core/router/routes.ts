@@ -5,17 +5,34 @@ declare module 'vue-router' {
   interface RouteMeta extends AccessMeta {
     requiresAuth?: boolean
     title?: string
+    icon?: string
+    hidden?: boolean
+    order?: number
   }
 }
 
 export const routes: RouteRecordRaw[] = [
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/features/home/views/LoginView.vue'),
+    meta: { title: '登录', hidden: true },
+  },
+  {
     path: '/',
-    name: 'home',
-    component: () => import('@/features/home/views/HomeView.vue'),
-    meta: {
-      title: 'Home',
-    },
+    redirect: '/dashboard',
+  },
+  {
+    path: '/dashboard',
+    component: () => import('@/app/layouts/AdminLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'dashboard',
+        component: () => import('@/app/views/DashboardView.vue'),
+        meta: { title: '仪表盘', icon: 'GridOutline', order: 0, requiresAuth: true },
+      },
+    ],
   },
   {
     path: '/forbidden',

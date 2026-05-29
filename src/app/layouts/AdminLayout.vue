@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useLayoutSetting } from '@/core/theme/useLayoutSetting'
 import AdminSidebar from './components/AdminSidebar.vue'
 import AdminTopbar from './components/AdminTopbar.vue'
 import AdminTabs from './components/AdminTabs.vue'
+import { useMenuRoutes } from './composables/useMenuRoutes'
 
 const { setting } = useLayoutSetting()
-
-const menuOptions = ref([])
+const { menuOptions } = useMenuRoutes()
 </script>
 
 <template>

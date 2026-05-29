@@ -7,12 +7,19 @@ export async function ensureDynamicRoutes(router: Router, roles: UserRole[]) {
   let added = false
 
   dynamicRoutes.forEach((route) => {
-    if (!route.name) {
+    if (route.name) {
+      const routeName = String(route.name)
+      if (!router.hasRoute(routeName)) {
+        router.addRoute(route)
+        added = true
+      }
       return
     }
 
-    const routeName = String(route.name)
-    if (!router.hasRoute(routeName)) {
+    const childNeedsAdd = (route.children || []).some(
+      (child) => child.name && !router.hasRoute(String(child.name)),
+    )
+    if (childNeedsAdd) {
       router.addRoute(route)
       added = true
     }
