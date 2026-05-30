@@ -91,11 +91,43 @@ export const getDictTypeListEndpoint = defineGetEndpoint<'/api/system/dicts', Di
   '/api/system/dicts',
 )
 
+export const createDictTypeEndpoint = definePostEndpoint<
+  '/api/system/dicts',
+  void,
+  Omit<DictType, 'id'>
+>('/api/system/dicts')
+
+export const updateDictTypeEndpoint = definePutEndpoint<
+  '/api/system/dicts/:id',
+  void,
+  Partial<Omit<DictType, 'id'>>
+>('/api/system/dicts/:id')
+
+export const deleteDictTypeEndpoint = defineDeleteEndpoint<'/api/system/dicts/:id', void>(
+  '/api/system/dicts/:id',
+)
+
 export const getDictDataListEndpoint = defineGetEndpoint<
   '/api/system/dicts/:type/data',
   DictData[],
   { typeCode: string }
 >('/api/system/dicts/:type/data')
+
+export const createDictDataEndpoint = definePostEndpoint<
+  '/api/system/dicts/:type/data',
+  void,
+  Omit<DictData, 'id' | 'typeCode'>
+>('/api/system/dicts/:type/data')
+
+export const updateDictDataEndpoint = definePutEndpoint<
+  '/api/system/dicts/data/:id',
+  void,
+  Partial<Omit<DictData, 'id' | 'typeCode'>>
+>('/api/system/dicts/data/:id')
+
+export const deleteDictDataEndpoint = defineDeleteEndpoint<'/api/system/dicts/data/:id', void>(
+  '/api/system/dicts/data/:id',
+)
 
 export type SystemUserData = InferEndpointResponse<typeof getSystemUserPageEndpoint>
 export type SystemRoleData = InferEndpointResponse<typeof getSystemRoleListEndpoint>
@@ -179,9 +211,65 @@ export async function getDictTypeList() {
   })
 }
 
+export async function createDictType(data: InferEndpointRequest<typeof createDictTypeEndpoint>) {
+  return requestEndpoint(createDictTypeEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function updateDictType(
+  id: string,
+  data: InferEndpointRequest<typeof updateDictTypeEndpoint>,
+) {
+  void id
+  return requestEndpoint(updateDictTypeEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function deleteDictType(id: string) {
+  void id
+  return requestEndpoint(deleteDictTypeEndpoint, {
+    payload: undefined,
+    config: { timeout: 8000 },
+  })
+}
+
 export async function getDictDataList(typeCode: string) {
   return requestEndpoint(getDictDataListEndpoint, {
     payload: { typeCode },
+    config: { timeout: 8000 },
+  })
+}
+
+export async function createDictData(
+  typeCode: string,
+  data: InferEndpointRequest<typeof createDictDataEndpoint>,
+) {
+  void typeCode
+  return requestEndpoint(createDictDataEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function updateDictData(
+  id: string,
+  data: InferEndpointRequest<typeof updateDictDataEndpoint>,
+) {
+  void id
+  return requestEndpoint(updateDictDataEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function deleteDictData(id: string) {
+  void id
+  return requestEndpoint(deleteDictDataEndpoint, {
+    payload: undefined,
     config: { timeout: 8000 },
   })
 }

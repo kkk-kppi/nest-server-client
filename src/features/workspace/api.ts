@@ -1,5 +1,8 @@
 import {
   defineGetEndpoint,
+  definePostEndpoint,
+  definePutEndpoint,
+  defineDeleteEndpoint,
   requestEndpoint,
   type InferEndpointRequest,
   type InferEndpointResponse,
@@ -32,6 +35,22 @@ export const getWorkspaceTaskPageEndpoint = defineGetEndpoint<
   }
 >('/api/workspace/tasks')
 
+export const createWorkspaceTaskEndpoint = definePostEndpoint<
+  '/api/workspace/tasks',
+  void,
+  Omit<WorkspaceTask, 'id'>
+>('/api/workspace/tasks')
+
+export const updateWorkspaceTaskEndpoint = definePutEndpoint<
+  '/api/workspace/tasks/:id',
+  void,
+  Partial<Omit<WorkspaceTask, 'id'>>
+>('/api/workspace/tasks/:id')
+
+export const deleteWorkspaceTaskEndpoint = defineDeleteEndpoint<'/api/workspace/tasks/:id', void>(
+  '/api/workspace/tasks/:id',
+)
+
 export type WorkspaceSummaryData = InferEndpointResponse<typeof getWorkspaceSummaryEndpoint>
 export type WorkspaceTaskPageQuery = InferEndpointRequest<typeof getWorkspaceTaskPageEndpoint>
 export type WorkspaceTaskPageData = InferEndpointResponse<typeof getWorkspaceTaskPageEndpoint>
@@ -50,5 +69,33 @@ export async function getWorkspaceTaskPage(query: WorkspaceTaskPageQuery) {
     config: {
       timeout: 8000,
     },
+  })
+}
+
+export async function createWorkspaceTask(
+  data: InferEndpointRequest<typeof createWorkspaceTaskEndpoint>,
+) {
+  return requestEndpoint(createWorkspaceTaskEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function updateWorkspaceTask(
+  id: string,
+  data: InferEndpointRequest<typeof updateWorkspaceTaskEndpoint>,
+) {
+  void id
+  return requestEndpoint(updateWorkspaceTaskEndpoint, {
+    payload: data,
+    config: { timeout: 8000 },
+  })
+}
+
+export async function deleteWorkspaceTask(id: string) {
+  void id
+  return requestEndpoint(deleteWorkspaceTaskEndpoint, {
+    payload: undefined,
+    config: { timeout: 8000 },
   })
 }

@@ -3,6 +3,9 @@ import type { InferEndpointRequest, InferEndpointResponse, PageResult } from '@/
 import {
   getAdminDashboardEndpoint,
   getAuditLogPageEndpoint,
+  createAuditLogEndpoint,
+  updateAuditLogEndpoint,
+  deleteAuditLogEndpoint,
   type AuditLogPageData,
   type AuditLogPageQuery,
 } from '@/features/admin/api'
@@ -10,6 +13,9 @@ import { loginByRoleEndpoint, type LoginPayload, type LoginResult } from '@/feat
 import {
   getWorkspaceSummaryEndpoint,
   getWorkspaceTaskPageEndpoint,
+  createWorkspaceTaskEndpoint,
+  updateWorkspaceTaskEndpoint,
+  deleteWorkspaceTaskEndpoint,
   type WorkspaceSummaryData,
   type WorkspaceTaskPageData,
   type WorkspaceTaskPageQuery,
@@ -24,7 +30,13 @@ import {
   updateSystemRoleEndpoint,
   deleteSystemRoleEndpoint,
   getDictTypeListEndpoint,
+  createDictTypeEndpoint,
+  updateDictTypeEndpoint,
+  deleteDictTypeEndpoint,
   getDictDataListEndpoint,
+  createDictDataEndpoint,
+  updateDictDataEndpoint,
+  deleteDictDataEndpoint,
 } from '@/features/system/api'
 
 const workspaceSummary: WorkspaceSummaryData = {
@@ -257,12 +269,51 @@ export const handlers = [
     }
     return HttpResponse.json(resolvePageResult(workspaceTasks, query))
   }),
+  http.post(resolveMockPath(createWorkspaceTaskEndpoint.path), async ({ request }) => {
+    const body = (await request.json()) as Omit<WorkspaceTask, 'id'>
+    workspaceTasks.push({
+      ...body,
+      id: `t-${workspaceTasks.length + 1}`,
+    })
+    return HttpResponse.json(null, { status: 201 })
+  }),
+  http.put(resolveMockPath(updateWorkspaceTaskEndpoint.path), async ({ params, request }) => {
+    const body = (await request.json()) as Partial<Omit<WorkspaceTask, 'id'>>
+    const index = workspaceTasks.findIndex((t) => t.id === params.id)
+    if (index !== -1) Object.assign(workspaceTasks[index], body)
+    return HttpResponse.json(null)
+  }),
+  http.delete(resolveMockPath(deleteWorkspaceTaskEndpoint.path), ({ params }) => {
+    const index = workspaceTasks.findIndex((t) => t.id === params.id)
+    if (index !== -1) workspaceTasks.splice(index, 1)
+    return HttpResponse.json(null)
+  }),
   http.get(resolveMockPath(getAdminDashboardEndpoint.path), () => {
     return HttpResponse.json(adminDashboard)
   }),
   http.get(resolveMockPath(getAuditLogPageEndpoint.path), ({ request }) => {
     const query = resolvePageQuery<AuditLogPageQuery>(request)
     return HttpResponse.json(resolvePageResult(auditLogs, query))
+  }),
+  http.post(resolveMockPath(createAuditLogEndpoint.path), async ({ request }) => {
+    const body = (await request.json()) as Omit<AuditLogItem, 'id' | 'createdAt'>
+    auditLogs.push({
+      ...body,
+      id: `a-${auditLogs.length + 1}`,
+      createdAt: new Date().toISOString(),
+    })
+    return HttpResponse.json(null, { status: 201 })
+  }),
+  http.put(resolveMockPath(updateAuditLogEndpoint.path), async ({ params, request }) => {
+    const body = (await request.json()) as Partial<Omit<AuditLogItem, 'id' | 'createdAt'>>
+    const index = auditLogs.findIndex((a) => a.id === params.id)
+    if (index !== -1) Object.assign(auditLogs[index], body)
+    return HttpResponse.json(null)
+  }),
+  http.delete(resolveMockPath(deleteAuditLogEndpoint.path), ({ params }) => {
+    const index = auditLogs.findIndex((a) => a.id === params.id)
+    if (index !== -1) auditLogs.splice(index, 1)
+    return HttpResponse.json(null)
   }),
   http.post(resolveMockPath(loginByRoleEndpoint.path), async ({ request }) => {
     const payload = (await request.json()) as InferEndpointRequest<typeof loginByRoleEndpoint>
@@ -331,10 +382,52 @@ export const handlers = [
   http.get(resolveMockPath(getDictTypeListEndpoint.path), () => {
     return HttpResponse.json(dictTypes)
   }),
+  http.post(resolveMockPath(createDictTypeEndpoint.path), async ({ request }) => {
+    const body = (await request.json()) as Omit<(typeof dictTypes)[number], 'id'>
+    dictTypes.push({
+      ...body,
+      id: String(dictTypes.length + 1),
+    })
+    return HttpResponse.json(null, { status: 201 })
+  }),
+  http.put(resolveMockPath(updateDictTypeEndpoint.path), async ({ params, request }) => {
+    const body = (await request.json()) as Partial<Omit<(typeof dictTypes)[number], 'id'>>
+    const index = dictTypes.findIndex((d) => d.id === params.id)
+    if (index !== -1) Object.assign(dictTypes[index], body)
+    return HttpResponse.json(null)
+  }),
+  http.delete(resolveMockPath(deleteDictTypeEndpoint.path), ({ params }) => {
+    const index = dictTypes.findIndex((d) => d.id === params.id)
+    if (index !== -1) dictTypes.splice(index, 1)
+    return HttpResponse.json(null)
+  }),
   http.get(resolveMockPath(getDictDataListEndpoint.path), ({ params }) => {
     const typeCode = params.type as string
     const items = dictData.filter((d) => d.typeCode === typeCode)
     return HttpResponse.json(items)
+  }),
+  http.post(resolveMockPath(createDictDataEndpoint.path), async ({ params, request }) => {
+    const body = (await request.json()) as Omit<(typeof dictData)[number], 'id' | 'typeCode'>
+    const typeCode = params.type as string
+    dictData.push({
+      ...body,
+      id: String(dictData.length + 1),
+      typeCode,
+    })
+    return HttpResponse.json(null, { status: 201 })
+  }),
+  http.put(resolveMockPath(updateDictDataEndpoint.path), async ({ params, request }) => {
+    const body = (await request.json()) as Partial<
+      Omit<(typeof dictData)[number], 'id' | 'typeCode'>
+    >
+    const index = dictData.findIndex((d) => d.id === params.id)
+    if (index !== -1) Object.assign(dictData[index], body)
+    return HttpResponse.json(null)
+  }),
+  http.delete(resolveMockPath(deleteDictDataEndpoint.path), ({ params }) => {
+    const index = dictData.findIndex((d) => d.id === params.id)
+    if (index !== -1) dictData.splice(index, 1)
+    return HttpResponse.json(null)
   }),
   // 路由配置接口（后端模式）
   http.get(resolveMockPath('/api/auth/routes'), () => {

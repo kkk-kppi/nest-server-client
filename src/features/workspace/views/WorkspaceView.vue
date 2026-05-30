@@ -1,158 +1,239 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getWorkspaceSummary, getWorkspaceTaskPage } from '@/features/workspace/api'
+import { onMounted, ref, h } from 'vue'
 import {
-  hasPageItems,
-  resolvePageSize,
-  useAsyncState,
-  usePaginationState,
-  useRoutePageQuery,
-} from '@/shared'
+  NCard,
+  NGrid,
+  NGi,
+  NStatistic,
+  NSpace,
+  NButton,
+  NTag,
+  NPopconfirm,
+  NModal,
+  NForm,
+  NFormItem,
+  NInput,
+  NSelect,
+  NIcon,
+} from 'naive-ui'
+import {
+  FolderOpenOutline,
+  CheckmarkCircleOutline,
+  TimeOutline,
+  PeopleOutline,
+  AddOutline,
+} from '@vicons/ionicons5'
+import {
+  getWorkspaceSummary,
+  getWorkspaceTaskPage,
+  createWorkspaceTask,
+  updateWorkspaceTask,
+  deleteWorkspaceTask,
+} from '@/features/workspace/api'
+import { useAsyncState } from '@/shared'
+import ProTable from '@/shared/components/pro/ProTable.vue'
+import type { DataTableColumns } from 'naive-ui'
 
-const route = useRoute()
-const router = useRouter()
-const pageSizeOptions = [2, 5, 10]
 const summaryState = useAsyncState<Awaited<ReturnType<typeof getWorkspaceSummary>>>()
-const taskPageState = useAsyncState<Awaited<ReturnType<typeof getWorkspaceTaskPage>>>()
-const pagination = usePaginationState({
-  pageSizeOptions,
-  initialPageSize: 2,
-})
-const pageQuery = useRoutePageQuery({
-  route,
-  router,
-  pageKey: 'workspacePage',
-  pageSizeKey: 'workspacePageSize',
-})
 
 const summary = summaryState.data
-const taskPage = taskPageState.data
-const isLoading = summaryState.isLoading
-const isPageLoading = taskPageState.isLoading
-const page = pagination.page
-const pageSize = pagination.pageSize
-const totalPages = pagination.totalPages
-const canGoPrev = pagination.canGoPrev
-const canGoNext = pagination.canGoNext
-const errorMessage = computed(
-  () => summaryState.errorMessage.value || taskPageState.errorMessage.value,
-)
-const hasTaskData = computed(() => hasPageItems(taskPage.value?.items))
+
+// 任务表单
+const showModal = ref(false)
+const editingTask = ref<Record<string, unknown> | null>(null)
+const formValue = ref({
+  name: '',
+  status: 'todo' as 'todo' | 'doing' | 'done',
+})
+
+const proTableRef = ref()
+
+const columns: DataTableColumns = [
+  { title: '任务ID', key: 'id', width: 80 },
+  { title: '任务名称', key: 'name', width: 200 },
+  {
+    title: '状态',
+    key: 'status',
+    width: 100,
+    render: (row) => {
+      const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' }> = {
+        todo: { label: '待办', type: 'info' },
+        doing: { label: '进行中', type: 'warning' },
+        done: { label: '已完成', type: 'success' },
+      }
+      const status = statusMap[row.status as string] || statusMap.todo
+      return h(NTag, { type: status.type, size: 'small' }, { default: () => status.label })
+    },
+  },
+  {
+    title: '操作',
+    key: 'action',
+    width: 150,
+    render: (row) =>
+      h(
+        NSpace,
+        { size: 'small' },
+        {
+          default: () => [
+            h(
+              NButton,
+              { text: true, type: 'primary', onClick: () => handleEdit(row) },
+              { default: () => '编辑' },
+            ),
+            h(
+              NPopconfirm,
+              { onPositiveClick: () => handleDelete(row.id as string) },
+              {
+                trigger: () => h(NButton, { text: true, type: 'error' }, { default: () => '删除' }),
+                default: () => '确认删除？',
+              },
+            ),
+          ],
+        },
+      ),
+  },
+]
+
+const searchFields = [
+  { key: 'name', label: '任务名称' },
+  {
+    key: 'status',
+    label: '状态',
+    type: 'select' as const,
+    options: [
+      { label: '待办', value: 'todo' },
+      { label: '进行中', value: 'doing' },
+      { label: '已完成', value: 'done' },
+    ],
+  },
+]
+
+async function request(params: Record<string, string | number>) {
+  const result = await getWorkspaceTaskPage(params as { page: number; pageSize: number })
+  return { items: result.items as unknown as Record<string, unknown>[], total: result.meta.total }
+}
 
 async function loadWorkspaceSummary() {
   await summaryState.run(() => getWorkspaceSummary(), '加载工作区数据失败')
 }
 
-async function loadTaskPage(targetPage: number) {
-  const safePage = targetPage > 0 ? targetPage : 1
-  const result = await taskPageState.run(
-    () => getWorkspaceTaskPage({ page: safePage, pageSize: pageSize.value }),
-    '加载任务列表失败',
-  )
-  if (!result) {
-    return
-  }
-
-  pagination.setTotal(result.meta.total)
-  pagination.setPageSize(result.meta.pageSize)
-  pagination.setPage(result.meta.page)
-  await pageQuery.syncQuery({
-    page: page.value,
-    pageSize: pageSize.value,
-  })
+function handleAdd() {
+  editingTask.value = null
+  formValue.value = { name: '', status: 'todo' }
+  showModal.value = true
 }
 
-function goPrevPage() {
-  if (!pagination.goPrevPage()) {
-    return
+function handleEdit(row: Record<string, unknown>) {
+  editingTask.value = row
+  formValue.value = {
+    name: row.name as string,
+    status: row.status as 'todo' | 'doing' | 'done',
   }
-
-  void loadTaskPage(page.value)
+  showModal.value = true
 }
 
-function goNextPage() {
-  if (!pagination.goNextPage()) {
-    return
-  }
-
-  void loadTaskPage(page.value)
+async function handleDelete(id: string) {
+  await deleteWorkspaceTask(id)
+  proTableRef.value?.refresh()
 }
 
-function onPageSizeChange(event: Event) {
-  const target = event.target as HTMLSelectElement | null
-  if (!target) {
-    return
+async function handleSubmit() {
+  if (editingTask.value) {
+    await updateWorkspaceTask(editingTask.value.id as string, { ...formValue.value })
+  } else {
+    await createWorkspaceTask({ ...formValue.value })
   }
-
-  const parsed = Number.parseInt(target.value, 10)
-  const nextPageSize = resolvePageSize(parsed, pageSizeOptions, pageSize.value)
-  if (nextPageSize === pageSize.value) {
-    return
-  }
-
-  pagination.setPageSizeAndReset(nextPageSize)
-  void loadTaskPage(1)
+  showModal.value = false
+  proTableRef.value?.refresh()
 }
 
 onMounted(() => {
-  const initialState = pageQuery.resolveInitialState({
-    defaultPage: page.value,
-    defaultPageSize: pageSize.value,
-    pageSizeOptions,
-  })
-  pagination.setPageSize(initialState.pageSize)
-  pagination.setPage(initialState.page)
   void loadWorkspaceSummary()
-  void loadTaskPage(initialState.page)
 })
 </script>
 
 <template>
-  <main style="min-height: 100vh; display: grid; place-items: center">
-    <section style="display: grid; gap: 10px; text-align: center; min-width: 360px">
-      <h1>Workspace</h1>
-      <p v-if="isLoading">Loading...</p>
-      <p v-else-if="errorMessage" style="color: #d33">{{ errorMessage }}</p>
-      <template v-else-if="summary">
-        <p>Project: {{ summary.projectName }}</p>
-        <p>Owner: {{ summary.owner }}</p>
-        <p>Tasks: {{ summary.taskCount }}</p>
+  <n-space vertical :size="16">
+    <!-- 统计卡片 -->
+    <n-grid :cols="4" :x-gap="16" :y-gap="16">
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#18a058"><FolderOpenOutline /></n-icon>
+          </template>
+          <n-statistic label="项目名称" :value="summary?.projectName ?? '-'" />
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
+          </template>
+          <n-statistic label="负责人" :value="summary?.owner ?? '-'" />
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#f0a020"><TimeOutline /></n-icon>
+          </template>
+          <n-statistic label="任务总数" :value="summary?.taskCount ?? 0" />
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#18a058"><CheckmarkCircleOutline /></n-icon>
+          </template>
+          <n-statistic label="项目状态" value="进行中" />
+        </n-card>
+      </n-gi>
+    </n-grid>
+
+    <!-- 任务列表 -->
+    <ProTable
+      ref="proTableRef"
+      :columns="columns"
+      :request="request"
+      :search-fields="searchFields"
+      title="任务列表"
+    >
+      <template #toolbar>
+        <n-button type="primary" @click="handleAdd">
+          <template #icon
+            ><n-icon><AddOutline /></n-icon
+          ></template>
+          新增任务
+        </n-button>
       </template>
-      <p style="font-weight: 700">Task List</p>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 8px">
-        <span>Page Size</span>
-        <select :value="pageSize" :disabled="isPageLoading" @change="onPageSizeChange">
-          <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
-        </select>
-      </div>
-      <p v-if="isPageLoading">Loading tasks...</p>
-      <p v-else-if="!hasTaskData">暂无任务</p>
-      <ul v-else style="list-style: none; padding: 0; margin: 0; display: grid; gap: 6px">
-        <li
-          v-for="item in taskPage?.items ?? []"
-          :key="item.id"
-          style="
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 8px 10px;
-          "
-        >
-          <span>{{ item.name }}</span>
-          <span>{{ item.status }}</span>
-        </li>
-      </ul>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 8px">
-        <button type="button" :disabled="!canGoPrev || isPageLoading" @click="goPrevPage">
-          Prev
-        </button>
-        <span>{{ page }} / {{ totalPages }}</span>
-        <button type="button" :disabled="!canGoNext || isPageLoading" @click="goNextPage">
-          Next
-        </button>
-      </div>
-    </section>
-  </main>
+    </ProTable>
+  </n-space>
+
+  <!-- 任务弹窗 -->
+  <n-modal
+    v-model:show="showModal"
+    preset="dialog"
+    :title="editingTask ? '编辑任务' : '新增任务'"
+    style="width: 500px"
+  >
+    <n-form :model="formValue" label-width="80">
+      <n-form-item label="任务名称" required>
+        <n-input v-model:value="formValue.name" placeholder="请输入任务名称" />
+      </n-form-item>
+      <n-form-item label="状态">
+        <n-select
+          v-model:value="formValue.status"
+          :options="[
+            { label: '待办', value: 'todo' },
+            { label: '进行中', value: 'doing' },
+            { label: '已完成', value: 'done' },
+          ]"
+        />
+      </n-form-item>
+    </n-form>
+    <template #action>
+      <n-button @click="showModal = false">取消</n-button>
+      <n-button type="primary" @click="handleSubmit">确定</n-button>
+    </template>
+  </n-modal>
 </template>

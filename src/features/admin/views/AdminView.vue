@@ -1,159 +1,215 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getAdminDashboardData, getAuditLogPage } from '@/features/admin/api'
+import { onMounted, ref, h } from 'vue'
 import {
-  hasPageItems,
-  resolvePageSize,
-  useAsyncState,
-  usePaginationState,
-  useRoutePageQuery,
-} from '@/shared'
+  NCard,
+  NGrid,
+  NGi,
+  NStatistic,
+  NSpace,
+  NButton,
+  NPopconfirm,
+  NModal,
+  NForm,
+  NFormItem,
+  NInput,
+  NIcon,
+} from 'naive-ui'
+import {
+  PeopleOutline,
+  WarningOutline,
+  InformationCircleOutline,
+  DocumentOutline,
+  AddOutline,
+} from '@vicons/ionicons5'
+import {
+  getAdminDashboardData,
+  getAuditLogPage,
+  createAuditLog,
+  updateAuditLog,
+  deleteAuditLog,
+} from '@/features/admin/api'
+import { useAsyncState } from '@/shared'
+import ProTable from '@/shared/components/pro/ProTable.vue'
+import type { DataTableColumns } from 'naive-ui'
 
-const route = useRoute()
-const router = useRouter()
-const pageSizeOptions = [2, 5, 10]
 const dashboardState = useAsyncState<Awaited<ReturnType<typeof getAdminDashboardData>>>()
-const auditLogPageState = useAsyncState<Awaited<ReturnType<typeof getAuditLogPage>>>()
-const pagination = usePaginationState({
-  pageSizeOptions,
-  initialPageSize: 2,
-})
-const pageQuery = useRoutePageQuery({
-  route,
-  router,
-  pageKey: 'adminPage',
-  pageSizeKey: 'adminPageSize',
-})
 
 const dashboard = dashboardState.data
-const auditLogPage = auditLogPageState.data
-const isLoading = dashboardState.isLoading
-const isPageLoading = auditLogPageState.isLoading
-const page = pagination.page
-const pageSize = pagination.pageSize
-const totalPages = pagination.totalPages
-const canGoPrev = pagination.canGoPrev
-const canGoNext = pagination.canGoNext
-const errorMessage = computed(
-  () => dashboardState.errorMessage.value || auditLogPageState.errorMessage.value,
-)
-const hasAuditData = computed(() => hasPageItems(auditLogPage.value?.items))
+
+// 审计日志表单
+const showModal = ref(false)
+const editingLog = ref<Record<string, unknown> | null>(null)
+const formValue = ref({
+  operator: '',
+  action: '',
+})
+
+const proTableRef = ref()
+
+const columns: DataTableColumns = [
+  { title: '日志ID', key: 'id', width: 80 },
+  { title: '操作人', key: 'operator', width: 120 },
+  { title: '操作内容', key: 'action', width: 200 },
+  { title: '创建时间', key: 'createdAt', width: 180 },
+  {
+    title: '操作',
+    key: 'action',
+    width: 150,
+    render: (row) =>
+      h(
+        NSpace,
+        { size: 'small' },
+        {
+          default: () => [
+            h(
+              NButton,
+              { text: true, type: 'primary', onClick: () => handleEdit(row) },
+              { default: () => '编辑' },
+            ),
+            h(
+              NPopconfirm,
+              { onPositiveClick: () => handleDelete(row.id as string) },
+              {
+                trigger: () => h(NButton, { text: true, type: 'error' }, { default: () => '删除' }),
+                default: () => '确认删除？',
+              },
+            ),
+          ],
+        },
+      ),
+  },
+]
+
+const searchFields = [
+  { key: 'operator', label: '操作人' },
+  { key: 'action', label: '操作内容' },
+]
+
+async function request(params: Record<string, string | number>) {
+  const result = await getAuditLogPage(params as { page: number; pageSize: number })
+  return { items: result.items as unknown as Record<string, unknown>[], total: result.meta.total }
+}
 
 async function loadAdminDashboard() {
   await dashboardState.run(() => getAdminDashboardData(), '加载管理数据失败')
 }
 
-async function loadAuditPage(targetPage: number) {
-  const safePage = targetPage > 0 ? targetPage : 1
-  const result = await auditLogPageState.run(
-    () => getAuditLogPage({ page: safePage, pageSize: pageSize.value }),
-    '加载审计日志失败',
-  )
-  if (!result) {
-    return
-  }
-
-  pagination.setTotal(result.meta.total)
-  pagination.setPageSize(result.meta.pageSize)
-  pagination.setPage(result.meta.page)
-  await pageQuery.syncQuery({
-    page: page.value,
-    pageSize: pageSize.value,
-  })
+function handleAdd() {
+  editingLog.value = null
+  formValue.value = { operator: '', action: '' }
+  showModal.value = true
 }
 
-function goPrevPage() {
-  if (!pagination.goPrevPage()) {
-    return
+function handleEdit(row: Record<string, unknown>) {
+  editingLog.value = row
+  formValue.value = {
+    operator: row.operator as string,
+    action: row.action as string,
   }
-
-  void loadAuditPage(page.value)
+  showModal.value = true
 }
 
-function goNextPage() {
-  if (!pagination.goNextPage()) {
-    return
-  }
-
-  void loadAuditPage(page.value)
+async function handleDelete(id: string) {
+  await deleteAuditLog(id)
+  proTableRef.value?.refresh()
 }
 
-function onPageSizeChange(event: Event) {
-  const target = event.target as HTMLSelectElement | null
-  if (!target) {
-    return
+async function handleSubmit() {
+  if (editingLog.value) {
+    await updateAuditLog(editingLog.value.id as string, { ...formValue.value })
+  } else {
+    await createAuditLog({ ...formValue.value })
   }
-
-  const parsed = Number.parseInt(target.value, 10)
-  const nextPageSize = resolvePageSize(parsed, pageSizeOptions, pageSize.value)
-  if (nextPageSize === pageSize.value) {
-    return
-  }
-
-  pagination.setPageSizeAndReset(nextPageSize)
-  void loadAuditPage(1)
+  showModal.value = false
+  proTableRef.value?.refresh()
 }
 
 onMounted(() => {
-  const initialState = pageQuery.resolveInitialState({
-    defaultPage: page.value,
-    defaultPageSize: pageSize.value,
-    pageSizeOptions,
-  })
-  pagination.setPageSize(initialState.pageSize)
-  pagination.setPage(initialState.page)
   void loadAdminDashboard()
-  void loadAuditPage(initialState.page)
 })
 </script>
 
 <template>
-  <main style="min-height: 100vh; display: grid; place-items: center">
-    <section style="display: grid; gap: 10px; text-align: center; min-width: 420px">
-      <h1>Admin</h1>
-      <p v-if="isLoading">Loading...</p>
-      <p v-else-if="errorMessage" style="color: #d33">{{ errorMessage }}</p>
-      <template v-else-if="dashboard">
-        <p>Online Users: {{ dashboard.onlineUsers }}</p>
-        <p>Error Rate: {{ dashboard.errorRate }}%</p>
-        <p>Release: {{ dashboard.releaseVersion }}</p>
+  <n-space vertical :size="16">
+    <!-- 仪表盘统计卡片 -->
+    <n-grid :cols="4" :x-gap="16" :y-gap="16">
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
+          </template>
+          <n-statistic label="在线用户" :value="dashboard?.onlineUsers ?? 0" />
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#d03050"><WarningOutline /></n-icon>
+          </template>
+          <n-statistic label="错误率">
+            <template #default>
+              <span :style="{ color: (dashboard?.errorRate ?? 0) > 0.1 ? '#d03050' : '#18a058' }">
+                {{ dashboard?.errorRate ?? 0 }}%
+              </span>
+            </template>
+          </n-statistic>
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#18a058"><InformationCircleOutline /></n-icon>
+          </template>
+          <n-statistic label="当前版本" :value="dashboard?.releaseVersion ?? '-'" />
+        </n-card>
+      </n-gi>
+      <n-gi>
+        <n-card>
+          <template #header-extra>
+            <n-icon size="24" color="#f0a020"><DocumentOutline /></n-icon>
+          </template>
+          <n-statistic label="系统状态" value="正常" />
+        </n-card>
+      </n-gi>
+    </n-grid>
+
+    <!-- 审计日志列表 -->
+    <ProTable
+      ref="proTableRef"
+      :columns="columns"
+      :request="request"
+      :search-fields="searchFields"
+      title="审计日志"
+    >
+      <template #toolbar>
+        <n-button type="primary" @click="handleAdd">
+          <template #icon
+            ><n-icon><AddOutline /></n-icon
+          ></template>
+          新增日志
+        </n-button>
       </template>
-      <p style="font-weight: 700">Audit Logs</p>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 8px">
-        <span>Page Size</span>
-        <select :value="pageSize" :disabled="isPageLoading" @change="onPageSizeChange">
-          <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
-        </select>
-      </div>
-      <p v-if="isPageLoading">Loading logs...</p>
-      <p v-else-if="!hasAuditData">暂无审计日志</p>
-      <ul v-else style="list-style: none; padding: 0; margin: 0; display: grid; gap: 6px">
-        <li
-          v-for="item in auditLogPage?.items ?? []"
-          :key="item.id"
-          style="
-            display: grid;
-            gap: 4px;
-            text-align: left;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 8px 10px;
-          "
-        >
-          <span>{{ item.operator }} - {{ item.action }}</span>
-          <span>{{ item.createdAt }}</span>
-        </li>
-      </ul>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 8px">
-        <button type="button" :disabled="!canGoPrev || isPageLoading" @click="goPrevPage">
-          Prev
-        </button>
-        <span>{{ page }} / {{ totalPages }}</span>
-        <button type="button" :disabled="!canGoNext || isPageLoading" @click="goNextPage">
-          Next
-        </button>
-      </div>
-    </section>
-  </main>
+    </ProTable>
+  </n-space>
+
+  <!-- 日志弹窗 -->
+  <n-modal
+    v-model:show="showModal"
+    preset="dialog"
+    :title="editingLog ? '编辑日志' : '新增日志'"
+    style="width: 500px"
+  >
+    <n-form :model="formValue" label-width="80">
+      <n-form-item label="操作人" required>
+        <n-input v-model:value="formValue.operator" placeholder="请输入操作人" />
+      </n-form-item>
+      <n-form-item label="操作内容" required>
+        <n-input v-model:value="formValue.action" placeholder="请输入操作内容" />
+      </n-form-item>
+    </n-form>
+    <template #action>
+      <n-button @click="showModal = false">取消</n-button>
+      <n-button type="primary" @click="handleSubmit">确定</n-button>
+    </template>
+  </n-modal>
 </template>
