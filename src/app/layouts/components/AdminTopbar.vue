@@ -13,13 +13,15 @@ import { useLayoutSetting } from '@/core/theme/useLayoutSetting'
 import AdminBreadcrumb from './AdminBreadcrumb.vue'
 import AdminUserMenu from './AdminUserMenu.vue'
 import AdminSettingPanel from './AdminSettingPanel.vue'
+import type { MenuOption } from 'naive-ui'
 
 defineProps<{
   layoutMode: 'side' | 'top' | 'mix'
+  menuOptions?: MenuOption[]
 }>()
 
 const { isDark, toggleDark } = useTheme()
-const { toggleSidebar } = useLayoutSetting()
+const { setting, toggleSidebar } = useLayoutSetting()
 
 const isFullscreen = ref(false)
 const showSettingPanel = ref(false)
@@ -45,7 +47,14 @@ function toggleFullscreen() {
           </n-icon>
         </template>
       </n-button>
-      <AdminBreadcrumb v-if="layoutMode === 'side'" />
+      <AdminBreadcrumb v-if="layoutMode === 'side' && setting.showBreadcrumb" />
+      <n-menu
+        v-if="layoutMode === 'top' && menuOptions"
+        mode="horizontal"
+        :options="menuOptions"
+        :value="$route.name as string"
+        @update:value="(key: string) => $router.push({ name: key })"
+      />
     </div>
 
     <n-space align="center" :size="8">

@@ -27,7 +27,7 @@ const { menuOptions } = useMenuRoutes()
 
     <n-layout>
       <n-layout-header :bordered="false" style="padding: 0 16px">
-        <AdminTopbar :layout-mode="setting.mode" />
+        <AdminTopbar :layout-mode="setting.mode" :menu-options="menuOptions" />
       </n-layout-header>
 
       <n-layout-header v-if="setting.showTabs" :bordered="false" style="padding: 0 16px">
