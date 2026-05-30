@@ -1,4 +1,4 @@
-import { h, ref, watchEffect } from 'vue'
+import { h, shallowRef, watchEffect, computed } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
@@ -57,7 +57,8 @@ function routeToMenuOption(route: RouteRecordRaw): MenuOption | null {
 
 export function useMenuRoutes() {
   const authStore = useAuthStore()
-  const menuOptions = ref<MenuOption[]>([])
+  const menuOptions = shallowRef<MenuOption[]>([])
+  const selectedTopKey = shallowRef<string>('')
 
   watchEffect(async () => {
     try {
@@ -69,5 +70,33 @@ export function useMenuRoutes() {
     }
   })
 
-  return { menuOptions }
+  // 一级菜单（用于混合模式顶部）
+  const topMenuOptions = computed<MenuOption[]>(() => {
+    return menuOptions.value.map((item) => ({
+      label: item.label,
+      key: item.key,
+      icon: item.icon,
+    }))
+  })
+
+  // 二级菜单（用于混合模式侧边栏）
+  const subMenuOptions = computed<MenuOption[]>(() => {
+    if (!selectedTopKey.value) {
+      return (menuOptions.value[0]?.children as MenuOption[]) || []
+    }
+    const selected = menuOptions.value.find((item) => item.key === selectedTopKey.value)
+    return (selected?.children as MenuOption[]) || []
+  })
+
+  function setSelectedTopKey(key: string) {
+    selectedTopKey.value = key
+  }
+
+  return {
+    menuOptions,
+    topMenuOptions,
+    subMenuOptions,
+    selectedTopKey,
+    setSelectedTopKey,
+  }
 }

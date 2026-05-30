@@ -6,13 +6,14 @@ import AdminTabs from './components/AdminTabs.vue'
 import { useMenuRoutes } from './composables/useMenuRoutes'
 
 const { setting } = useLayoutSetting()
-const { menuOptions } = useMenuRoutes()
+const { menuOptions, topMenuOptions, subMenuOptions, selectedTopKey, setSelectedTopKey } =
+  useMenuRoutes()
 </script>
 
 <template>
   <n-layout has-sider style="height: 100vh">
     <n-layout-sider
-      v-if="setting.mode !== 'top'"
+      v-if="setting.mode === 'side'"
       :collapsed="setting.sidebarCollapsed"
       :width="setting.sidebarWidth"
       :collapsed-width="64"
@@ -25,9 +26,28 @@ const { menuOptions } = useMenuRoutes()
       <AdminSidebar :menu-options="menuOptions" :collapsed="setting.sidebarCollapsed" />
     </n-layout-sider>
 
+    <n-layout-sider
+      v-if="setting.mode === 'mix'"
+      :collapsed="setting.sidebarCollapsed"
+      :width="setting.sidebarWidth"
+      :collapsed-width="64"
+      show-trigger
+      collapse-mode="width"
+      bordered
+      @collapse="setting.sidebarCollapsed = true"
+      @expand="setting.sidebarCollapsed = false"
+    >
+      <AdminSidebar :menu-options="subMenuOptions" :collapsed="setting.sidebarCollapsed" />
+    </n-layout-sider>
+
     <n-layout>
       <n-layout-header :bordered="false" style="padding: 0 16px">
-        <AdminTopbar :layout-mode="setting.mode" :menu-options="menuOptions" />
+        <AdminTopbar
+          :layout-mode="setting.mode"
+          :menu-options="setting.mode === 'top' ? menuOptions : topMenuOptions"
+          :selected-top-key="selectedTopKey"
+          @update:selected-top-key="setSelectedTopKey"
+        />
       </n-layout-header>
 
       <n-layout-header v-if="setting.showTabs" :bordered="false" style="padding: 0 16px">

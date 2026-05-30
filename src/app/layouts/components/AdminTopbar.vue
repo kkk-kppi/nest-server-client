@@ -15,9 +15,14 @@ import AdminUserMenu from './AdminUserMenu.vue'
 import AdminSettingPanel from './AdminSettingPanel.vue'
 import type { MenuOption } from 'naive-ui'
 
-defineProps<{
+const props = defineProps<{
   layoutMode: 'side' | 'top' | 'mix'
   menuOptions?: MenuOption[]
+  selectedTopKey?: string
+}>()
+
+const emit = defineEmits<{
+  'update:selectedTop-key': [key: string]
 }>()
 
 const { isDark, toggleDark } = useTheme()
@@ -35,6 +40,13 @@ function toggleFullscreen() {
     isFullscreen.value = false
   }
 }
+
+function handleTopMenuClick(key: string) {
+  if (props.layoutMode === 'mix') {
+    emit('update:selectedTop-key', key)
+  }
+  // top 模式下不处理点击，因为菜单项没有对应的路由
+}
 </script>
 
 <template>
@@ -49,11 +61,11 @@ function toggleFullscreen() {
       </n-button>
       <AdminBreadcrumb v-if="layoutMode === 'side' && setting.showBreadcrumb" />
       <n-menu
-        v-if="layoutMode === 'top' && menuOptions"
+        v-if="(layoutMode === 'top' || layoutMode === 'mix') && menuOptions"
         mode="horizontal"
         :options="menuOptions"
-        :value="$route.name as string"
-        @update:value="(key: string) => $router.push({ name: key })"
+        :value="layoutMode === 'mix' ? selectedTopKey : ($route.name as string)"
+        @update:value="handleTopMenuClick"
       />
     </div>
 
