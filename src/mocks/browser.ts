@@ -6,5 +6,8 @@ const worker = setupWorker(...handlers)
 export async function enableMocking() {
   await worker.start({
     onUnhandledRequest: 'bypass',
+    serviceWorker: {
+      url: '/mockServiceWorker.js',
+    },
   })
 }
