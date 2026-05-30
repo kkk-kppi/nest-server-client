@@ -84,17 +84,23 @@ export async function updateAuditLog(
   id: string,
   data: InferEndpointRequest<typeof updateAuditLogEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateAuditLogEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateAuditLogEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateAuditLogEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteAuditLog(id: string) {
-  void id
-  return requestEndpoint(deleteAuditLogEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteAuditLogEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteAuditLogEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }

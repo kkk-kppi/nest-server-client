@@ -85,17 +85,23 @@ export async function updateWorkspaceTask(
   id: string,
   data: InferEndpointRequest<typeof updateWorkspaceTaskEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateWorkspaceTaskEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateWorkspaceTaskEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateWorkspaceTaskEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteWorkspaceTask(id: string) {
-  void id
-  return requestEndpoint(deleteWorkspaceTaskEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteWorkspaceTaskEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteWorkspaceTaskEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }

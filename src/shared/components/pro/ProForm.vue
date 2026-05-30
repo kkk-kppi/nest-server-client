@@ -51,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
   labelPlacement: 'left',
   cols: 1,
   disabled: false,
+  rules: () => ({}),
 })
 
 const emit = defineEmits<{

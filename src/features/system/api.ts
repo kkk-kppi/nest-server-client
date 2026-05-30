@@ -156,19 +156,25 @@ export async function updateSystemUser(
   id: string,
   data: InferEndpointRequest<typeof updateSystemUserEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateSystemUserEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateSystemUserEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateSystemUserEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteSystemUser(id: string) {
-  void id
-  return requestEndpoint(deleteSystemUserEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteSystemUserEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteSystemUserEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function getSystemRoleList() {
@@ -190,19 +196,25 @@ export async function updateSystemRole(
   id: string,
   data: InferEndpointRequest<typeof updateSystemRoleEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateSystemRoleEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateSystemRoleEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateSystemRoleEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteSystemRole(id: string) {
-  void id
-  return requestEndpoint(deleteSystemRoleEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteSystemRoleEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteSystemRoleEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function getDictTypeList() {
@@ -222,19 +234,25 @@ export async function updateDictType(
   id: string,
   data: InferEndpointRequest<typeof updateDictTypeEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateDictTypeEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateDictTypeEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateDictTypeEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteDictType(id: string) {
-  void id
-  return requestEndpoint(deleteDictTypeEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteDictTypeEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteDictTypeEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function getDictDataList(typeCode: string) {
@@ -248,28 +266,37 @@ export async function createDictData(
   typeCode: string,
   data: InferEndpointRequest<typeof createDictDataEndpoint>,
 ) {
-  void typeCode
-  return requestEndpoint(createDictDataEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = createDictDataEndpoint.path.replace(':type', typeCode)
+  return requestEndpoint(
+    { ...createDictDataEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function updateDictData(
   id: string,
   data: InferEndpointRequest<typeof updateDictDataEndpoint>,
 ) {
-  void id
-  return requestEndpoint(updateDictDataEndpoint, {
-    payload: data,
-    config: { timeout: 8000 },
-  })
+  const url = updateDictDataEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...updateDictDataEndpoint, path: url },
+    {
+      payload: data,
+      config: { timeout: 8000 },
+    },
+  )
 }
 
 export async function deleteDictData(id: string) {
-  void id
-  return requestEndpoint(deleteDictDataEndpoint, {
-    payload: undefined,
-    config: { timeout: 8000 },
-  })
+  const url = deleteDictDataEndpoint.path.replace(':id', id)
+  return requestEndpoint(
+    { ...deleteDictDataEndpoint, path: url },
+    {
+      payload: undefined,
+      config: { timeout: 8000 },
+    },
+  )
 }
