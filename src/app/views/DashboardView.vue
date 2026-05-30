@@ -22,7 +22,9 @@ import { NCard, NGrid, NGi, NStatistic, NSpace } from 'naive-ui'
       </n-gi>
       <n-gi>
         <n-card>
-          <n-statistic label="收入" :value="123456" prefix="¥" />
+          <n-statistic label="收入" :value="123456">
+            <template #prefix>¥</template>
+          </n-statistic>
         </n-card>
       </n-gi>
     </n-grid>
