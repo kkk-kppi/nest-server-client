@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   SunnyOutline,
   MoonOutline,
@@ -25,6 +26,7 @@ const emit = defineEmits<{
   'update:selectedTop-key': [key: string]
 }>()
 
+const router = useRouter()
 const { isDark, toggleDark } = useTheme()
 const { setting, toggleSidebar } = useLayoutSetting()
 
@@ -44,8 +46,18 @@ function toggleFullscreen() {
 function handleTopMenuClick(key: string) {
   if (props.layoutMode === 'mix') {
     emit('update:selectedTop-key', key)
+    // 找到对应的菜单项，导航到第一个子菜单
+    const option = props.menuOptions?.find((item) => item.key === key)
+    if (option?.children?.length) {
+      const firstChild = option.children[0]
+      if (firstChild?.key) {
+        router.push({ name: firstChild.key as string })
+      }
+    }
+  } else if (props.layoutMode === 'top') {
+    // top 模式直接导航
+    router.push({ name: key })
   }
-  // top 模式下不处理点击，因为菜单项没有对应的路由
 }
 </script>
 
