@@ -48,6 +48,17 @@ function routeToMenuOption(route: RouteRecordRaw, keepParent = false): MenuOptio
     return children[0]
   }
 
+  // 保留父级时，如果父级没有名称，但有子菜单，使用第一个子菜单的信息
+  if (keepParent && !route.name && children.length > 0) {
+    const firstChild = children[0]
+    return {
+      label: (meta?.title as string) || (firstChild.label as string) || '',
+      key: (firstChild.key as string) || route.path,
+      icon: meta?.icon ? renderIcon(meta.icon as string) : firstChild.icon,
+      children: children.length > 0 ? children : undefined,
+    }
+  }
+
   if (!route.name && children.length === 0) return null
 
   return {
