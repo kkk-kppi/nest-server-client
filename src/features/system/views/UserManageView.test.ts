@@ -2,12 +2,20 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import { NConfigProvider, NMessageProvider } from 'naive-ui'
+import { createI18n } from 'vue-i18n'
 import UserManageView from './UserManageView.vue'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
+import zhCN from '@/core/i18n/zh-CN'
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  messages: { 'zh-CN': zhCN },
+})
 
 function createWrapper() {
   const pinia = createTestingPinia({
-    createSpy: (fn: () => void) => {
+    createSpy: (fn: ((...args: unknown[]) => unknown) | undefined) => {
       return vi.fn(fn)
     },
   })
@@ -22,7 +30,7 @@ function createWrapper() {
 
   return mount(UserManageView, {
     global: {
-      plugins: [pinia],
+      plugins: [pinia, i18n],
       components: { NConfigProvider, NMessageProvider },
     },
   })
@@ -43,7 +51,7 @@ describe('UserManageView', () => {
 
   it('renders without errors', () => {
     const pinia = createTestingPinia({
-      createSpy: (fn: () => void) => {
+      createSpy: (fn: ((...args: unknown[]) => unknown) | undefined) => {
         return vi.fn(fn)
       },
     })
@@ -53,7 +61,7 @@ describe('UserManageView', () => {
 
     const wrapper = mount(UserManageView, {
       global: {
-        plugins: [pinia],
+        plugins: [pinia, i18n],
         components: { NConfigProvider, NMessageProvider },
       },
     })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   NDataTable,
   NCard,
@@ -52,6 +53,8 @@ const props = withDefaults(defineProps<Props>(), {
   title: '',
 })
 
+const { t } = useI18n()
+
 const emit = defineEmits<{
   search: [values: Record<string, string | number>]
   reset: []
@@ -87,7 +90,8 @@ const tablePagination = computed<PaginationProps>(() => ({
   itemCount: total.value,
   showSizePicker: true,
   pageSizes: [10, 20, 50, 100],
-  prefix: ({ itemCount }: { itemCount: number | undefined }) => `共 ${itemCount ?? 0} 条`,
+  prefix: ({ itemCount }: { itemCount: number | undefined }) =>
+    t('common.total', { total: itemCount ?? 0 }),
   onChange: (page: number) => {
     currentPage.value = page
     fetchData()
@@ -206,8 +210,8 @@ defineExpose({
             @update:value="(val: string | number) => (searchValues[field.key] = val)"
           />
         </template>
-        <n-button type="primary" @click="handleSearch">搜索</n-button>
-        <n-button @click="handleReset">重置</n-button>
+        <n-button type="primary" @click="handleSearch">{{ t('common.search') }}</n-button>
+        <n-button @click="handleReset">{{ t('common.reset') }}</n-button>
       </n-space>
     </div>
 
@@ -226,13 +230,13 @@ defineExpose({
       <n-space>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button quaternary circle aria-label="刷新数据" @click="handleRefresh">
+            <n-button quaternary circle :aria-label="t('common.refresh')" @click="handleRefresh">
               <template #icon>
                 <n-icon><RefreshOutline /></n-icon>
               </template>
             </n-button>
           </template>
-          刷新
+          {{ t('common.refresh') }}
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
@@ -240,7 +244,7 @@ defineExpose({
               quaternary
               circle
               :aria-pressed="isFullscreen"
-              :aria-label="isFullscreen ? '退出全屏' : '进入全屏'"
+              :aria-label="isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen')"
               @click="toggleFullscreen"
             >
               <template #icon>
@@ -251,7 +255,7 @@ defineExpose({
               </template>
             </n-button>
           </template>
-          {{ isFullscreen ? '退出全屏' : '全屏' }}
+          {{ isFullscreen ? t('common.exitFullscreen') : t('common.fullscreen') }}
         </n-tooltip>
       </n-space>
     </div>
@@ -259,11 +263,13 @@ defineExpose({
     <n-result
       v-if="error && !tableData.length"
       status="error"
-      title="加载失败"
+      :title="t('common.error')"
       :description="error.message"
     >
       <template #footer>
-        <n-button data-testid="retry-button" @click="handleRetry"> 重试 </n-button>
+        <n-button data-testid="retry-button" @click="handleRetry">
+          {{ t('common.retry') }}
+        </n-button>
       </template>
     </n-result>
 

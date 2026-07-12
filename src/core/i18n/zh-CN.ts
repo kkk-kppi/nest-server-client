@@ -24,6 +24,10 @@ export default {
     failed: '操作失败',
     confirmDelete: '确认删除？',
     deleteSuccess: '删除成功',
+    error: '加载失败',
+    retry: '重试',
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
   },
   pagination: {
     total: '共 {total} 条',
@@ -59,6 +63,10 @@ export default {
       phone: '手机',
       role: '角色',
       status: '状态',
+      addUser: '新增用户',
+      editUser: '编辑用户',
+      deleteUser: '删除用户',
+      confirmDelete: '确认删除该用户？',
     },
     role: {
       title: '角色管理',

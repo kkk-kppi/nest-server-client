@@ -24,6 +24,10 @@ export default {
     failed: 'Failed',
     confirmDelete: 'Confirm delete?',
     deleteSuccess: 'Deleted successfully',
+    error: 'Failed to load',
+    retry: 'Retry',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit Fullscreen',
   },
   pagination: {
     total: 'Total {total}',
@@ -59,6 +63,10 @@ export default {
       phone: 'Phone',
       role: 'Role',
       status: 'Status',
+      addUser: 'Add User',
+      editUser: 'Edit User',
+      deleteUser: 'Delete User',
+      confirmDelete: 'Are you sure to delete this user?',
     },
     role: {
       title: 'Role Management',

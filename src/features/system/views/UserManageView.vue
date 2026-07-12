@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { NButton, NSpace, NTag, NPopconfirm, NModal } from 'naive-ui'
 import ProTable from '@/shared/components/pro/ProTable.vue'
 import ProForm from '@/shared/components/pro/ProForm.vue'
@@ -15,6 +16,7 @@ import type { SystemUserData } from '@/features/system/api'
 
 type UserRow = SystemUserData['items'][number]
 
+const { t } = useI18n()
 const proTableRef = ref()
 const proFormRef = ref()
 const showModal = ref(false)
@@ -67,29 +69,24 @@ const deleteMutation = useMutation({
   },
 })
 
-const columns: Array<{
-  title: string
-  key: string
-  width?: number
-  render?: (row: UserRow) => unknown
-}> = [
-  { title: '用户名', key: 'username', width: 120 },
-  { title: '昵称', key: 'nickname', width: 120 },
-  { title: '邮箱', key: 'email', width: 180 },
-  { title: '手机', key: 'phone', width: 140 },
+const columns = [
+  { title: t('system.user.username'), key: 'username', width: 120 },
+  { title: t('system.user.nickname'), key: 'nickname', width: 120 },
+  { title: t('system.user.email'), key: 'email', width: 180 },
+  { title: t('system.user.phone'), key: 'phone', width: 140 },
   {
-    title: '状态',
+    title: t('system.user.status'),
     key: 'status',
     width: 80,
     render: (row: UserRow) =>
       h(
         NTag,
         { type: row.status === '0' ? 'success' : 'error', size: 'small' },
-        { default: () => (row.status === '0' ? '正常' : '停用') },
+        { default: () => (row.status === '0' ? t('common.enable') : t('common.disable')) },
       ),
   },
   {
-    title: '操作',
+    title: t('common.action'),
     key: 'action',
     width: 150,
     render: (row: UserRow) =>
@@ -102,7 +99,7 @@ const columns: Array<{
               ? h(
                   NButton,
                   { text: true, type: 'primary', onClick: () => handleEdit(row) },
-                  { default: () => '编辑' },
+                  { default: () => t('common.edit') },
                 )
               : null,
             canDeleteSystem.value
@@ -111,8 +108,12 @@ const columns: Array<{
                   { onPositiveClick: () => deleteMutation.mutate(row.id) },
                   {
                     trigger: () =>
-                      h(NButton, { text: true, type: 'error' }, { default: () => '删除' }),
-                    default: () => '确认删除？',
+                      h(
+                        NButton,
+                        { text: true, type: 'error' },
+                        { default: () => t('common.delete') },
+                      ),
+                    default: () => t('system.user.confirmDelete'),
                   },
                 )
               : null,
@@ -123,30 +124,30 @@ const columns: Array<{
 ]
 
 const searchFields = [
-  { key: 'username', label: '用户名' },
+  { key: 'username', label: t('system.user.username') },
   {
     key: 'status',
-    label: '状态',
+    label: t('system.user.status'),
     type: 'select' as const,
     options: [
-      { label: '正常', value: '0' },
-      { label: '停用', value: '1' },
+      { label: t('common.enable'), value: '0' },
+      { label: t('common.disable'), value: '1' },
     ],
   },
 ]
 
 const formFields = [
-  { key: 'username', label: '用户名', required: true },
-  { key: 'nickname', label: '昵称', required: true },
-  { key: 'email', label: '邮箱' },
-  { key: 'phone', label: '手机' },
+  { key: 'username', label: t('system.user.username'), required: true },
+  { key: 'nickname', label: t('system.user.nickname'), required: true },
+  { key: 'email', label: t('system.user.email') },
+  { key: 'phone', label: t('system.user.phone') },
   {
     key: 'status',
-    label: '状态',
+    label: t('system.user.status'),
     type: 'select' as const,
     options: [
-      { label: '正常', value: '0' },
-      { label: '停用', value: '1' },
+      { label: t('common.enable'), value: '0' },
+      { label: t('common.disable'), value: '1' },
     ],
   },
 ]
@@ -205,17 +206,19 @@ async function handleSubmit() {
     :columns="columns"
     :request="request"
     :search-fields="searchFields"
-    title="用户管理"
+    :title="t('system.user.title')"
   >
     <template #toolbar>
-      <n-button v-if="canCreateSystem" type="primary" @click="handleAdd"> 新增用户 </n-button>
+      <n-button v-if="canCreateSystem" type="primary" @click="handleAdd">
+        {{ t('system.user.addUser') }}
+      </n-button>
     </template>
   </ProTable>
 
   <n-modal
     v-model:show="showModal"
     preset="dialog"
-    :title="editingUser ? '编辑用户' : '新增用户'"
+    :title="editingUser ? t('system.user.editUser') : t('system.user.addUser')"
     style="width: 500px"
   >
     <ProForm
@@ -227,13 +230,13 @@ async function handleSubmit() {
     >
       <template #action>
         <n-space justify="end">
-          <n-button @click="showModal = false">取消</n-button>
+          <n-button @click="showModal = false">{{ t('common.cancel') }}</n-button>
           <n-button
             type="primary"
             :loading="createMutation.isLoading.value || updateMutation.isLoading.value"
             @click="handleSubmit"
           >
-            确定
+            {{ t('common.confirm') }}
           </n-button>
         </n-space>
       </template>

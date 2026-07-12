@@ -11,3 +11,6 @@ export const i18n = createI18n({
     'en-US': enUS,
   },
 })
+
+export { useLocale } from './useLocale'
+export type { Locale } from './useLocale'
