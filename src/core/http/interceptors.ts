@@ -10,6 +10,7 @@ const DEFAULT_RETRY_DELAY = 300
 let accessTokenGetter: (() => string) | undefined
 let unauthorizedHandler: (() => void) | undefined
 let unauthorizedHandling = false
+const allowedOrigins: Set<string> = new Set()
 const pendingRequestMap = new Map<string, AbortController>()
 
 function sleep(ms: number) {
@@ -81,7 +82,35 @@ function isRetriable(error: AxiosError<ApiResponse<unknown>>) {
   return RETRY_STATUS.has(status)
 }
 
-export function setupInterceptors(http: AxiosInstance) {
+function isAllowedOrigin(url: string): boolean {
+  try {
+    // Relative URLs are always allowed (same origin)
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return true
+    }
+
+    const parsedUrl = new URL(url)
+    const origin = parsedUrl.origin
+
+    // Check if origin is in allowed list
+    return allowedOrigins.has(origin)
+  } catch {
+    // If URL parsing fails, assume it's a relative URL
+    return true
+  }
+}
+
+export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
+  // Set up allowed origins from API base URL
+  if (apiBaseUrl) {
+    try {
+      const parsed = new URL(apiBaseUrl)
+      allowedOrigins.add(parsed.origin)
+    } catch {
+      // If parsing fails, assume same origin
+    }
+  }
+
   http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const retryConfig = config as RetryRequestConfig
     withRetryDefaults(retryConfig)
@@ -100,10 +129,15 @@ export function setupInterceptors(http: AxiosInstance) {
 
     const accessToken = accessTokenGetter?.()
 
-    if (accessToken) {
-      const headers = AxiosHeaders.from(config.headers)
-      headers.set('Authorization', `Bearer ${accessToken}`)
-      config.headers = headers
+    // Only add auth header for allowed origins
+    if (accessToken && config.url) {
+      const fullUrl = config.baseURL ? new URL(config.url, config.baseURL).toString() : config.url
+
+      if (isAllowedOrigin(fullUrl)) {
+        const headers = AxiosHeaders.from(config.headers)
+        headers.set('Authorization', `Bearer ${accessToken}`)
+        config.headers = headers
+      }
     }
 
     return config
@@ -159,4 +193,12 @@ export function setAccessTokenGetter(getter: () => string) {
 
 export function setUnauthorizedHandler(handler: () => void) {
   unauthorizedHandler = handler
+}
+
+export function addAllowedOrigin(origin: string): void {
+  allowedOrigins.add(origin)
+}
+
+export function clearAllowedOrigins(): void {
+  allowedOrigins.clear()
 }

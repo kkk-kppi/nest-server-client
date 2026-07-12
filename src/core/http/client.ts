@@ -7,4 +7,4 @@ export const http = axios.create({
   timeout: 10000,
 })
 
-setupInterceptors(http)
+setupInterceptors(http, appEnv.apiBaseUrl)

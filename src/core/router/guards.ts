@@ -3,11 +3,25 @@ import { canAccess } from '@/features/auth/permission'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import { ensureDynamicRoutes } from './dynamic'
 
-const AUTH_WHITELIST = new Set(['login', 'forbidden', 'not-found'])
+// Explicit public routes - these are accessible without authentication
+const EXPLICIT_PUBLIC_ROUTES = new Set(['login', 'forbidden', 'not-found'])
 
-export function isPublicRoute(routeName: string, requiresAuth: boolean | undefined) {
-  const isWhitelisted = AUTH_WHITELIST.has(routeName)
-  return !requiresAuth || isWhitelisted
+export function isPublicRoute(
+  routeName: string,
+  meta: { public?: boolean; requiresAuth?: boolean } | undefined,
+): boolean {
+  // Explicit public declaration takes precedence
+  if (meta?.public === true) {
+    return true
+  }
+
+  // Legacy whitelist for backward compatibility
+  if (EXPLICIT_PUBLIC_ROUTES.has(routeName)) {
+    return true
+  }
+
+  // Fail-closed: if not explicitly public, require auth
+  return false
 }
 
 export function resolveDocumentTitle(title: unknown) {
@@ -26,23 +40,19 @@ export function setupRouterGuards(router: Router) {
     }
 
     const routeName = to.name ? String(to.name) : ''
-    const isPublicPage = isPublicRoute(routeName, to.meta.requiresAuth)
+    const isPublicPage = isPublicRoute(routeName, to.meta)
 
-    const isProtectedPath =
-      to.name === 'not-found' && (to.path.startsWith('/workspace') || to.path.startsWith('/admin'))
-
-    if (!authStore.isAuthenticated && isProtectedPath) {
-      return { name: 'login' }
-    }
-
+    // Public routes are accessible to everyone
     if (isPublicPage) {
       return true
     }
 
+    // Fail-closed: require authentication for all non-public routes
     if (!authStore.isAuthenticated) {
       return { name: 'login' }
     }
 
+    // Check role/permission access
     const pass = canAccess(authStore.roles, authStore.permissions, to.meta)
     if (!pass) {
       return { name: 'forbidden' }

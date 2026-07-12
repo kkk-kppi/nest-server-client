@@ -4,6 +4,7 @@ import type { AccessMeta } from '@/features/auth/permission'
 declare module 'vue-router' {
   interface RouteMeta extends AccessMeta {
     requiresAuth?: boolean
+    public?: boolean
     title?: string
     icon?: string
     hidden?: boolean
@@ -16,7 +17,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/features/home/views/LoginView.vue'),
-    meta: { title: '登录', hidden: true },
+    meta: { title: '登录', hidden: true, public: true },
   },
   {
     path: '/',
@@ -36,13 +37,13 @@ export const routes: RouteRecordRaw[] = [
         path: '/forbidden',
         name: 'forbidden',
         component: () => import('@/app/views/ForbiddenView.vue'),
-        meta: { title: 'Forbidden', hidden: true },
+        meta: { title: 'Forbidden', hidden: true, public: true },
       },
       {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('@/app/views/NotFoundView.vue'),
-        meta: { title: 'Not Found', hidden: true },
+        meta: { title: 'Not Found', hidden: true, public: true },
       },
     ],
   },

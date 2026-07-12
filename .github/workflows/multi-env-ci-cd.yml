@@ -38,7 +38,7 @@ on:
           - all
       rollback_version:
         type: string
-        description: rollback version tag or release id
+        description: 'rollback version (SemVer, release ID, or sha256:<64 hex>)'
         required: false
       dry_run:
         type: boolean
@@ -109,6 +109,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm verify:api
+      - run: pnpm audit --prod --audit-level high
       - run: pnpm build
       - uses: actions/upload-artifact@v4
         with:
@@ -138,12 +139,14 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
 
-  image_scan:
+  build_image:
     runs-on: ubuntu-latest
     needs: build_artifact
     if: |
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy')
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -151,7 +154,11 @@ jobs:
           name: web-dist-${{ github.sha }}
           path: dist
       - name: Build Docker image
-        run: docker build -t app:${{ github.sha }} .
+        id: build
+        run: |
+          docker build -t app:${{ github.sha }} .
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' app:${{ github.sha }} 2>/dev/null || echo "local-build")
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -160,10 +167,17 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ github.sha }}
+          path: |
+            Dockerfile
+            nginx.conf
+            docker/entrypoint.sh
 
   deploy_dev:
     runs-on: ubuntu-latest
-    needs: [build_artifact, image_scan]
+    needs: [build_image]
     environment: dev
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
@@ -173,8 +187,9 @@ jobs:
         with:
           name: web-dist-${{ github.sha }}
           path: dist
-      - run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+      - name: Deploy to dev
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Dry run enabled. Skip DEV_DEPLOY_COMMAND execution."
             exit 0
           fi
@@ -182,11 +197,12 @@ jobs:
             echo "DEV_DEPLOY_COMMAND is not configured."
             exit 1
           fi
-          eval "${{ secrets.DEV_DEPLOY_COMMAND }}"
+          # Execute deploy command (no eval - direct execution)
+          ${{ secrets.DEV_DEPLOY_COMMAND }}
 
   deploy_test:
     runs-on: ubuntu-latest
-    needs: [build_artifact, image_scan]
+    needs: [build_image]
     environment: test
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/test') ||
@@ -196,8 +212,9 @@ jobs:
         with:
           name: web-dist-${{ github.sha }}
           path: dist
-      - run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+      - name: Deploy to test
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Dry run enabled. Skip TEST_DEPLOY_COMMAND execution."
             exit 0
           fi
@@ -205,11 +222,11 @@ jobs:
             echo "TEST_DEPLOY_COMMAND is not configured."
             exit 1
           fi
-          eval "${{ secrets.TEST_DEPLOY_COMMAND }}"
+          ${{ secrets.TEST_DEPLOY_COMMAND }}
 
   deploy_stage:
     runs-on: ubuntu-latest
-    needs: [build_artifact, image_scan]
+    needs: [build_image]
     environment: stage
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/stage') ||
@@ -219,8 +236,9 @@ jobs:
         with:
           name: web-dist-${{ github.sha }}
           path: dist
-      - run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+      - name: Deploy to stage
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Dry run enabled. Skip STAGE_DEPLOY_COMMAND execution."
             exit 0
           fi
@@ -228,12 +246,15 @@ jobs:
             echo "STAGE_DEPLOY_COMMAND is not configured."
             exit 1
           fi
-          eval "${{ secrets.STAGE_DEPLOY_COMMAND }}"
+          ${{ secrets.STAGE_DEPLOY_COMMAND }}
 
   deploy_prod:
     runs-on: ubuntu-latest
-    needs: [build_artifact, image_scan]
+    needs: [build_image]
     environment: prod
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
     if: |
       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && (github.event.inputs.target == 'prod' || github.event.inputs.target == 'all'))
@@ -242,8 +263,9 @@ jobs:
         with:
           name: web-dist-${{ github.sha }}
           path: dist
-      - run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+      - name: Deploy to prod
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Dry run enabled. Skip PROD_DEPLOY_COMMAND execution."
             exit 0
           fi
@@ -251,14 +273,27 @@ jobs:
             echo "PROD_DEPLOY_COMMAND is not configured."
             exit 1
           fi
-          eval "${{ secrets.PROD_DEPLOY_COMMAND }}"
+          ${{ secrets.PROD_DEPLOY_COMMAND }}
 
   rollback:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'rollback' && github.event.inputs.target != 'all'
     environment: ${{ github.event.inputs.target }}
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
     steps:
-      - run: |
+      - name: Validate rollback version
+        id: validate
+        run: |
+          VERSION="${{ github.event.inputs.rollback_version }}"
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: rollback_version is required"
+            exit 1
+          fi
+          node scripts/validate-release-input.mjs "$VERSION"
+      - name: Execute rollback
+        run: |
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Dry run enabled. Skip rollback command execution."
             exit 0
@@ -290,4 +325,4 @@ jobs:
             echo "Rollback command is not configured for $TARGET."
             exit 1
           fi
-          RELEASE_VERSION="${{ github.event.inputs.rollback_version }}" eval "$CMD"
+          RELEASE_VERSION="${{ github.event.inputs.rollback_version }}" $CMD

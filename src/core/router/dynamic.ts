@@ -1,29 +1,35 @@
 import type { Router } from 'vue-router'
 import type { UserRole } from '@/features/auth/store/useAuthStore'
 import { getDynamicRoutes } from './route-mode'
+import {
+  isDynamicRoutesInitialized,
+  markDynamicRoutesInitialized,
+  installDynamicRoutes,
+  resetDynamicRoutes,
+} from './registry'
 
-export async function ensureDynamicRoutes(router: Router, roles: UserRole[]) {
-  const dynamicRoutes = await getDynamicRoutes(roles)
-  let added = false
+export async function ensureDynamicRoutes(router: Router, roles: UserRole[]): Promise<boolean> {
+  // Skip if already initialized with same roles
+  if (isDynamicRoutesInitialized()) {
+    return false
+  }
 
-  dynamicRoutes.forEach((route) => {
-    if (route.name) {
-      const routeName = String(route.name)
-      if (!router.hasRoute(routeName)) {
-        router.addRoute(route)
-        added = true
-      }
-      return
+  try {
+    const dynamicRoutes = await getDynamicRoutes(roles)
+    const installedCount = installDynamicRoutes(router, dynamicRoutes)
+
+    if (installedCount > 0) {
+      markDynamicRoutesInitialized(roles)
+      return true
     }
 
-    const childNeedsAdd = (route.children || []).some(
-      (child) => child.name && !router.hasRoute(String(child.name)),
-    )
-    if (childNeedsAdd) {
-      router.addRoute(route)
-      added = true
-    }
-  })
+    return false
+  } catch (error) {
+    console.error('[DynamicRoutes] Failed to ensure dynamic routes:', error)
+    return false
+  }
+}
 
-  return added
+export function clearDynamicRoutes(router: Router): void {
+  resetDynamicRoutes(router)
 }

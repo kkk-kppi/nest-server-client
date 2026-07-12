@@ -5,6 +5,7 @@ import { createAppRouter } from '@/core/router'
 import { i18n } from '@/core/i18n'
 import { setAccessTokenGetter, setUnauthorizedHandler } from '@/core/http'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
+import { clearDynamicRoutes } from '@/core/router/dynamic'
 import { initObservability } from '@/core/observability'
 import '../style.css'
 
@@ -19,6 +20,8 @@ export async function bootstrap() {
   const authStore = useAuthStore()
   setAccessTokenGetter(() => authStore.accessToken)
   setUnauthorizedHandler(() => {
+    // Clear dynamic routes before clearing session
+    clearDynamicRoutes(router)
     authStore.clearSession()
     authStore.setAuthNotice('登录状态已失效，请重新登录')
     router.replace({ name: 'login' })

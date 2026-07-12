@@ -12,8 +12,11 @@ RUN rm -rf /etc/nginx/conf.d/default.conf \
   && mkdir -p /var/cache/nginx /var/run /tmp/nginx \
   && chown -R nginx:nginx /var/cache/nginx /var/run /tmp/nginx
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY docker/entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 COPY --from=builder /app/dist ${APP_HOME}
 RUN chown -R nginx:nginx ${APP_HOME}
 EXPOSE 8080
 USER nginx
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
