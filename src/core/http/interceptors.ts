@@ -8,8 +8,8 @@ const DEFAULT_RETRY = 2
 const DEFAULT_RETRY_DELAY = 300
 
 let accessTokenGetter: (() => string) | undefined
-let unauthorizedHandler: (() => void) | undefined
-let unauthorizedHandling = false
+let unauthorizedHandler: (() => void | Promise<void>) | undefined
+let unauthorizedInFlight: Promise<void> | null = null
 const allowedOrigins: Set<string> = new Set()
 const pendingRequestMap = new Map<string, AbortController>()
 
@@ -191,13 +191,20 @@ export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
       removePendingRequest(config)
 
       if (error.response?.status === 401) {
-        if (!unauthorizedHandling) {
-          unauthorizedHandling = true
-          unauthorizedHandler?.()
-          Promise.resolve().finally(() => {
-            unauthorizedHandling = false
-          })
+        // Single-flight: only execute unauthorized handler once for concurrent 401s
+        if (!unauthorizedInFlight) {
+          unauthorizedInFlight = Promise.resolve()
+            .then(() => unauthorizedHandler?.())
+            .catch(() => {
+              // Silently handle errors in unauthorized handler to prevent unhandled rejections
+            })
+            .finally(() => {
+              unauthorizedInFlight = null
+            })
         }
+
+        // Wait for the unauthorized handler to complete before rejecting
+        await unauthorizedInFlight
         return Promise.reject(error)
       }
 
@@ -237,7 +244,7 @@ export function setAccessTokenGetter(getter: () => string) {
   accessTokenGetter = getter
 }
 
-export function setUnauthorizedHandler(handler: () => void) {
+export function setUnauthorizedHandler(handler: () => void | Promise<void>) {
   unauthorizedHandler = handler
 }
 
