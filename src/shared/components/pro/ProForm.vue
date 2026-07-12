@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import {
   NForm,
   NFormItem,
@@ -13,7 +14,7 @@ import {
   NTimePicker,
   NSpace,
 } from 'naive-ui'
-import type { FormRules, SelectOption } from 'naive-ui'
+import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 
 interface FormField {
   key: string
@@ -58,6 +59,42 @@ const emit = defineEmits<{
   'update:model': [value: Record<string, unknown>]
 }>()
 
+const formRef = ref<FormInst | null>(null)
+
+const autoRules = computed<FormRules>(() => {
+  const rules: FormRules = {}
+  for (const field of props.fields) {
+    if (field.required) {
+      rules[field.key] = {
+        required: true,
+        message: `请输入${field.label}`,
+        trigger: ['input', 'blur'],
+      }
+    }
+  }
+  return rules
+})
+
+const mergedRules = computed<FormRules>(() => ({
+  ...autoRules.value,
+  ...props.rules,
+}))
+
+async function validate() {
+  if (!formRef.value) return
+  return formRef.value.validate()
+}
+
+function reset() {
+  if (!formRef.value) return
+  formRef.value.restoreValidation()
+}
+
+function restoreValidation() {
+  if (!formRef.value) return
+  formRef.value.restoreValidation()
+}
+
 function updateField(key: string, value: unknown) {
   emit('update:model', { ...props.model, [key]: value })
 }
@@ -79,10 +116,22 @@ function getSelectValue(key: string): string | number | undefined {
   if (val === undefined || val === null) return undefined
   return val as string | number
 }
+
+defineExpose({
+  validate,
+  reset,
+  restoreValidation,
+})
 </script>
 
 <template>
-  <n-form :model="model" :rules="rules" :label-width="labelWidth" :label-placement="labelPlacement">
+  <n-form
+    ref="formRef"
+    :model="model"
+    :rules="mergedRules"
+    :label-width="labelWidth"
+    :label-placement="labelPlacement"
+  >
     <n-grid :cols="cols" :x-gap="16">
       <n-gi v-for="field in fields" :key="field.key" :span="field.span || 1">
         <n-form-item :label="field.label" :path="field.key">
@@ -92,6 +141,7 @@ function getSelectValue(key: string): string | number | undefined {
             :value="getStringValue(field.key)"
             :placeholder="field.placeholder || `请输入${field.label}`"
             :disabled="field.disabled || disabled"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -102,6 +152,7 @@ function getSelectValue(key: string): string | number | undefined {
             :value="getStringValue(field.key)"
             :placeholder="field.placeholder || `请输入${field.label}`"
             :disabled="field.disabled || disabled"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -112,6 +163,7 @@ function getSelectValue(key: string): string | number | undefined {
             :placeholder="field.placeholder"
             :disabled="field.disabled || disabled"
             style="width: 100%"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -123,6 +175,7 @@ function getSelectValue(key: string): string | number | undefined {
             :options="field.options"
             :disabled="field.disabled || disabled"
             clearable
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -131,6 +184,7 @@ function getSelectValue(key: string): string | number | undefined {
             v-else-if="field.type === 'switch'"
             :value="getBooleanValue(field.key)"
             :disabled="field.disabled || disabled"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -139,6 +193,7 @@ function getSelectValue(key: string): string | number | undefined {
             v-else-if="field.type === 'radio'"
             :value="getSelectValue(field.key)"
             :disabled="field.disabled || disabled"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           >
             <n-space>
@@ -153,6 +208,7 @@ function getSelectValue(key: string): string | number | undefined {
             v-else-if="field.type === 'checkbox'"
             :checked="getBooleanValue(field.key)"
             :disabled="field.disabled || disabled"
+            v-bind="field.props"
             @update:checked="updateField(field.key, $event)"
           />
 
@@ -162,6 +218,7 @@ function getSelectValue(key: string): string | number | undefined {
             :value="getNumberValue(field.key)"
             :disabled="field.disabled || disabled"
             style="width: 100%"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
 
@@ -171,6 +228,7 @@ function getSelectValue(key: string): string | number | undefined {
             :value="getNumberValue(field.key)"
             :disabled="field.disabled || disabled"
             style="width: 100%"
+            v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
         </n-form-item>
