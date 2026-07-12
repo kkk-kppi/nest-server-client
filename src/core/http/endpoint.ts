@@ -23,16 +23,30 @@ export type InferEndpointResponse<
 
 export type EndpointRequestConfig = Omit<RetryRequestConfig, 'url' | 'method' | 'params' | 'data'>
 
-type EndpointCallOptions<TEndpoint extends ApiEndpoint<HttpMethod, string, unknown, unknown>> =
-  InferEndpointRequest<TEndpoint> extends void
+// Extract path parameters from a path string like '/api/users/:id'
+type ExtractPathParams<TPath extends string> =
+  TPath extends `${string}:${infer Param}/${infer Rest}`
+    ? { [K in Param]: string } & ExtractPathParams<Rest>
+    : TPath extends `${string}:${infer Param}`
+      ? { [K in Param]: string }
+      : Record<string, never>
+
+// Structured endpoint call options
+type StructuredEndpointCallOptions<
+  TEndpoint extends ApiEndpoint<HttpMethod, string, unknown, unknown>,
+> =
+  TEndpoint extends ApiEndpoint<infer TMethod, infer TPath, infer TRequest, unknown>
     ? {
-        payload?: undefined
+        pathParams?: ExtractPathParams<TPath>
         config?: EndpointRequestConfig
-      }
-    : {
-        payload: InferEndpointRequest<TEndpoint>
-        config?: EndpointRequestConfig
-      }
+      } & (TMethod extends 'get' | 'delete'
+        ? TRequest extends void
+          ? { query?: undefined }
+          : { query: TRequest }
+        : TRequest extends void
+          ? { body?: undefined }
+          : { body: TRequest })
+    : never
 
 export function defineGetEndpoint<TPath extends string, TResponse, TQuery = void>(path: TPath) {
   return {
@@ -70,39 +84,73 @@ export function defineDeleteEndpoint<TPath extends string, TResponse = void>(pat
   } as const satisfies ApiEndpoint<'delete', TPath, void, TResponse>
 }
 
+function resolvePathParams(path: string, pathParams?: Record<string, string>): string {
+  // Check for path parameters in the path
+  const pathParamMatches = path.match(/:(\w+)/g)
+  if (!pathParamMatches) {
+    return path
+  }
+
+  // If path has parameters but no pathParams provided, throw error
+  if (!pathParams) {
+    const paramName = pathParamMatches[0].slice(1) // Remove the colon
+    throw new Error(`Missing path parameter "${paramName}" for path "${path}"`)
+  }
+
+  let resolvedPath = path
+  for (const [key, value] of Object.entries(pathParams)) {
+    const placeholder = `:${key}`
+    if (!resolvedPath.includes(placeholder)) {
+      throw new Error(`Path parameter "${key}" not found in path "${path}"`)
+    }
+    resolvedPath = resolvedPath.replace(placeholder, encodeURIComponent(value))
+  }
+
+  // Check for unresolved path parameters
+  const unresolvedMatch = resolvedPath.match(/:(\w+)/)
+  if (unresolvedMatch) {
+    throw new Error(`Missing path parameter "${unresolvedMatch[1]}" for path "${path}"`)
+  }
+
+  return resolvedPath
+}
+
 export async function requestEndpoint<
   TEndpoint extends ApiEndpoint<HttpMethod, string, unknown, unknown>,
->(endpoint: TEndpoint, options?: EndpointCallOptions<TEndpoint>) {
-  const payload = options?.payload as InferEndpointRequest<TEndpoint> | undefined
+>(endpoint: TEndpoint, options?: StructuredEndpointCallOptions<TEndpoint>) {
   const config = options?.config
+  const resolvedPath = resolvePathParams(
+    endpoint.path,
+    (options as { pathParams?: Record<string, string> })?.pathParams,
+  )
 
   switch (endpoint.method) {
     case 'get':
-      return get<InferEndpointResponse<TEndpoint>>(endpoint.path, {
+      return get<InferEndpointResponse<TEndpoint>>(resolvedPath, {
         ...config,
-        params: payload as Record<string, unknown> | undefined,
+        params: (options as { query?: Record<string, unknown> })?.query,
       })
     case 'delete':
-      return del<InferEndpointResponse<TEndpoint>>(endpoint.path, {
+      return del<InferEndpointResponse<TEndpoint>>(resolvedPath, {
         ...config,
-        params: payload as Record<string, unknown> | undefined,
+        params: (options as { query?: Record<string, unknown> })?.query,
       })
     case 'post':
       return post<InferEndpointResponse<TEndpoint>, InferEndpointRequest<TEndpoint>>(
-        endpoint.path,
-        payload,
+        resolvedPath,
+        (options as { body?: InferEndpointRequest<TEndpoint> })?.body,
         config,
       )
     case 'put':
       return put<InferEndpointResponse<TEndpoint>, InferEndpointRequest<TEndpoint>>(
-        endpoint.path,
-        payload,
+        resolvedPath,
+        (options as { body?: InferEndpointRequest<TEndpoint> })?.body,
         config,
       )
     case 'patch':
       return patch<InferEndpointResponse<TEndpoint>, InferEndpointRequest<TEndpoint>>(
-        endpoint.path,
-        payload,
+        resolvedPath,
+        (options as { body?: InferEndpointRequest<TEndpoint> })?.body,
         config,
       )
     default:

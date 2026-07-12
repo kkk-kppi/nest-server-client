@@ -24,7 +24,7 @@ export type LoginResult = InferEndpointResponse<typeof loginByRoleEndpoint>
 
 export async function loginByRole(payload: LoginPayload) {
   return requestEndpoint(loginByRoleEndpoint, {
-    payload,
+    body: payload,
     config: {
       timeout: 8000,
     },

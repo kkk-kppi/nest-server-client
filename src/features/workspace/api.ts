@@ -65,7 +65,7 @@ export async function getWorkspaceSummary() {
 
 export async function getWorkspaceTaskPage(query: WorkspaceTaskPageQuery) {
   return requestEndpoint(getWorkspaceTaskPageEndpoint, {
-    payload: query,
+    query,
     config: {
       timeout: 8000,
     },
@@ -76,7 +76,7 @@ export async function createWorkspaceTask(
   data: InferEndpointRequest<typeof createWorkspaceTaskEndpoint>,
 ) {
   return requestEndpoint(createWorkspaceTaskEndpoint, {
-    payload: data,
+    body: data,
     config: { timeout: 8000 },
   })
 }
@@ -85,23 +85,16 @@ export async function updateWorkspaceTask(
   id: string,
   data: InferEndpointRequest<typeof updateWorkspaceTaskEndpoint>,
 ) {
-  const url = updateWorkspaceTaskEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateWorkspaceTaskEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateWorkspaceTaskEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteWorkspaceTask(id: string) {
-  const url = deleteWorkspaceTaskEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteWorkspaceTaskEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteWorkspaceTaskEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }

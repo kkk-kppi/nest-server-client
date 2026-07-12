@@ -138,7 +138,7 @@ export async function getSystemUserPage(
   params: InferEndpointRequest<typeof getSystemUserPageEndpoint>,
 ) {
   return requestEndpoint(getSystemUserPageEndpoint, {
-    payload: params,
+    query: params,
     config: { timeout: 8000 },
   })
 }
@@ -147,7 +147,7 @@ export async function createSystemUser(
   data: InferEndpointRequest<typeof createSystemUserEndpoint>,
 ) {
   return requestEndpoint(createSystemUserEndpoint, {
-    payload: data,
+    body: data,
     config: { timeout: 8000 },
   })
 }
@@ -156,25 +156,18 @@ export async function updateSystemUser(
   id: string,
   data: InferEndpointRequest<typeof updateSystemUserEndpoint>,
 ) {
-  const url = updateSystemUserEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateSystemUserEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateSystemUserEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteSystemUser(id: string) {
-  const url = deleteSystemUserEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteSystemUserEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteSystemUserEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }
 
 export async function getSystemRoleList() {
@@ -187,7 +180,7 @@ export async function createSystemRole(
   data: InferEndpointRequest<typeof createSystemRoleEndpoint>,
 ) {
   return requestEndpoint(createSystemRoleEndpoint, {
-    payload: data,
+    body: data,
     config: { timeout: 8000 },
   })
 }
@@ -196,25 +189,18 @@ export async function updateSystemRole(
   id: string,
   data: InferEndpointRequest<typeof updateSystemRoleEndpoint>,
 ) {
-  const url = updateSystemRoleEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateSystemRoleEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateSystemRoleEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteSystemRole(id: string) {
-  const url = deleteSystemRoleEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteSystemRoleEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteSystemRoleEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }
 
 export async function getDictTypeList() {
@@ -225,7 +211,7 @@ export async function getDictTypeList() {
 
 export async function createDictType(data: InferEndpointRequest<typeof createDictTypeEndpoint>) {
   return requestEndpoint(createDictTypeEndpoint, {
-    payload: data,
+    body: data,
     config: { timeout: 8000 },
   })
 }
@@ -234,30 +220,23 @@ export async function updateDictType(
   id: string,
   data: InferEndpointRequest<typeof updateDictTypeEndpoint>,
 ) {
-  const url = updateDictTypeEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateDictTypeEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateDictTypeEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteDictType(id: string) {
-  const url = deleteDictTypeEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteDictTypeEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteDictTypeEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }
 
 export async function getDictDataList(typeCode: string) {
   return requestEndpoint(getDictDataListEndpoint, {
-    payload: { typeCode },
+    query: { typeCode },
     config: { timeout: 8000 },
   })
 }
@@ -266,37 +245,27 @@ export async function createDictData(
   typeCode: string,
   data: InferEndpointRequest<typeof createDictDataEndpoint>,
 ) {
-  const url = createDictDataEndpoint.path.replace(':type', typeCode)
-  return requestEndpoint(
-    { ...createDictDataEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(createDictDataEndpoint, {
+    pathParams: { type: typeCode },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function updateDictData(
   id: string,
   data: InferEndpointRequest<typeof updateDictDataEndpoint>,
 ) {
-  const url = updateDictDataEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateDictDataEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateDictDataEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteDictData(id: string) {
-  const url = deleteDictDataEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteDictDataEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteDictDataEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }

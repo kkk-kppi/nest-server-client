@@ -66,7 +66,7 @@ export async function getAdminDashboardData() {
 
 export async function getAuditLogPage(query: AuditLogPageQuery) {
   return requestEndpoint(getAuditLogPageEndpoint, {
-    payload: query,
+    query,
     config: {
       timeout: 8000,
     },
@@ -75,7 +75,7 @@ export async function getAuditLogPage(query: AuditLogPageQuery) {
 
 export async function createAuditLog(data: InferEndpointRequest<typeof createAuditLogEndpoint>) {
   return requestEndpoint(createAuditLogEndpoint, {
-    payload: data,
+    body: data,
     config: { timeout: 8000 },
   })
 }
@@ -84,23 +84,16 @@ export async function updateAuditLog(
   id: string,
   data: InferEndpointRequest<typeof updateAuditLogEndpoint>,
 ) {
-  const url = updateAuditLogEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...updateAuditLogEndpoint, path: url },
-    {
-      payload: data,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(updateAuditLogEndpoint, {
+    pathParams: { id },
+    body: data,
+    config: { timeout: 8000 },
+  })
 }
 
 export async function deleteAuditLog(id: string) {
-  const url = deleteAuditLogEndpoint.path.replace(':id', id)
-  return requestEndpoint(
-    { ...deleteAuditLogEndpoint, path: url },
-    {
-      payload: undefined,
-      config: { timeout: 8000 },
-    },
-  )
+  return requestEndpoint(deleteAuditLogEndpoint, {
+    pathParams: { id },
+    config: { timeout: 8000 },
+  })
 }
