@@ -18,7 +18,7 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "verify:api": "pnpm typecheck && pnpm exec vitest run src/core/http/ src/mocks/ api.test.ts",
+    "verify:api": "pnpm typecheck && pnpm exec vitest run src/core/http/request.test.ts src/core/http/endpoint.test.ts src/core/http/interceptors.test.ts src/mocks/ src/features/**/api.test.ts",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:codegen": "playwright codegen http://localhost:5173",

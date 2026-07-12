@@ -78,19 +78,22 @@ const columns = [
     title: t('system.user.status'),
     key: 'status',
     width: 80,
-    render: (row: UserRow) =>
-      h(
+    render: (row: Record<string, unknown>) => {
+      const user = row as unknown as UserRow
+      return h(
         NTag,
-        { type: row.status === '0' ? 'success' : 'error', size: 'small' },
-        { default: () => (row.status === '0' ? t('common.enable') : t('common.disable')) },
-      ),
+        { type: user.status === '0' ? 'success' : 'error', size: 'small' },
+        { default: () => (user.status === '0' ? t('common.enable') : t('common.disable')) },
+      )
+    },
   },
   {
     title: t('common.action'),
     key: 'action',
     width: 150,
-    render: (row: UserRow) =>
-      h(
+    render: (row: Record<string, unknown>) => {
+      const user = row as unknown as UserRow
+      return h(
         NSpace,
         { size: 'small' },
         {
@@ -98,14 +101,14 @@ const columns = [
             canUpdateSystem.value
               ? h(
                   NButton,
-                  { text: true, type: 'primary', onClick: () => handleEdit(row) },
+                  { text: true, type: 'primary', onClick: () => handleEdit(user) },
                   { default: () => t('common.edit') },
                 )
               : null,
             canDeleteSystem.value
               ? h(
                   NPopconfirm,
-                  { onPositiveClick: () => deleteMutation.mutate(row.id) },
+                  { onPositiveClick: () => deleteMutation.mutate(user.id) },
                   {
                     trigger: () =>
                       h(
@@ -119,7 +122,8 @@ const columns = [
               : null,
           ],
         },
-      ),
+      )
+    },
   },
 ]
 

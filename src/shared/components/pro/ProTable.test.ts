@@ -1,7 +1,30 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { NConfigProvider } from 'naive-ui'
+import { createI18n } from 'vue-i18n'
 import ProTable from './ProTable.vue'
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  messages: {
+    'zh-CN': {
+      common: {
+        search: '搜索',
+        reset: '重置',
+        add: '新增',
+        loading: '加载中...',
+        error: '加载失败',
+        retry: '重试',
+        noData: '暂无数据',
+        total: '共 {total} 条',
+        refresh: '刷新',
+        fullscreen: '全屏',
+        exitFullscreen: '退出全屏',
+      },
+    },
+  },
+})
 
 function createWrapper(props = {}) {
   return mount(ProTable, {
@@ -12,6 +35,7 @@ function createWrapper(props = {}) {
     },
     global: {
       components: { NConfigProvider },
+      plugins: [i18n],
     },
   })
 }
