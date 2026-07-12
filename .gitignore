@@ -34,11 +34,9 @@ cypress/downloads
 
 # OpenCode
 opencode.json
-.opencode
+.opencode/node_modules
+.opencode/plans
 .omo
-
-# docs
-docs/superpowers
 
 # Storybook
 storybook-static
