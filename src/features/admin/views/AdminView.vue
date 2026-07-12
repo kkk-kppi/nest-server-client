@@ -13,6 +13,7 @@ import {
   NFormItem,
   NInput,
   NIcon,
+  NAlert,
 } from 'naive-ui'
 import {
   PeopleOutline,
@@ -138,7 +139,17 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
           </template>
-          <n-statistic label="在线用户" :value="dashboard?.onlineUsers ?? 0" />
+          <n-statistic
+            v-if="dashboardState.status.value === 'success'"
+            label="在线用户"
+            :value="dashboard?.onlineUsers ?? 0"
+          />
+          <n-statistic v-else-if="dashboardState.isError.value" label="在线用户">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="在线用户" :value="0" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -146,13 +157,19 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#d03050"><WarningOutline /></n-icon>
           </template>
-          <n-statistic label="错误率">
+          <n-statistic v-if="dashboardState.status.value === 'success'" label="错误率">
             <template #default>
               <span :style="{ color: (dashboard?.errorRate ?? 0) > 0.1 ? '#d03050' : '#18a058' }">
                 {{ dashboard?.errorRate ?? 0 }}%
               </span>
             </template>
           </n-statistic>
+          <n-statistic v-else-if="dashboardState.isError.value" label="错误率">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="错误率" :value="0" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -160,7 +177,17 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#18a058"><InformationCircleOutline /></n-icon>
           </template>
-          <n-statistic label="当前版本" :value="dashboard?.releaseVersion ?? '-'" />
+          <n-statistic
+            v-if="dashboardState.status.value === 'success'"
+            label="当前版本"
+            :value="dashboard?.releaseVersion ?? '-'"
+          />
+          <n-statistic v-else-if="dashboardState.isError.value" label="当前版本">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="当前版本" value="-" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -168,10 +195,30 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#f0a020"><DocumentOutline /></n-icon>
           </template>
-          <n-statistic label="系统状态" value="正常" />
+          <n-statistic
+            v-if="dashboardState.status.value === 'success'"
+            label="系统状态"
+            value="正常"
+          />
+          <n-statistic v-else-if="dashboardState.isError.value" label="系统状态">
+            <template #default>
+              <span style="color: #d03050">异常</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="系统状态" value="加载中..." />
         </n-card>
       </n-gi>
     </n-grid>
+
+    <!-- 错误提示 -->
+    <n-alert
+      v-if="dashboardState.isError.value"
+      type="error"
+      closable
+      @close="dashboardState.reset()"
+    >
+      {{ dashboardState.errorMessage.value }}
+    </n-alert>
 
     <!-- 审计日志列表 -->
     <ProTable

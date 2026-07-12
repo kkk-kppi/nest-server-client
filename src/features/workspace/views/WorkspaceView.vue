@@ -15,6 +15,7 @@ import {
   NInput,
   NSelect,
   NIcon,
+  NAlert,
 } from 'naive-ui'
 import {
   FolderOpenOutline,
@@ -161,7 +162,17 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#18a058"><FolderOpenOutline /></n-icon>
           </template>
-          <n-statistic label="项目名称" :value="summary?.projectName ?? '-'" />
+          <n-statistic
+            v-if="summaryState.status.value === 'success'"
+            label="项目名称"
+            :value="summary?.projectName ?? '-'"
+          />
+          <n-statistic v-else-if="summaryState.isError.value" label="项目名称">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="项目名称" value="-" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -169,7 +180,17 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
           </template>
-          <n-statistic label="负责人" :value="summary?.owner ?? '-'" />
+          <n-statistic
+            v-if="summaryState.status.value === 'success'"
+            label="负责人"
+            :value="summary?.owner ?? '-'"
+          />
+          <n-statistic v-else-if="summaryState.isError.value" label="负责人">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="负责人" value="-" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -177,7 +198,17 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#f0a020"><TimeOutline /></n-icon>
           </template>
-          <n-statistic label="任务总数" :value="summary?.taskCount ?? 0" />
+          <n-statistic
+            v-if="summaryState.status.value === 'success'"
+            label="任务总数"
+            :value="summary?.taskCount ?? 0"
+          />
+          <n-statistic v-else-if="summaryState.isError.value" label="任务总数">
+            <template #default>
+              <span style="color: #d03050">加载失败</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="任务总数" :value="0" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -185,10 +216,25 @@ onMounted(() => {
           <template #header-extra>
             <n-icon size="24" color="#18a058"><CheckmarkCircleOutline /></n-icon>
           </template>
-          <n-statistic label="项目状态" value="进行中" />
+          <n-statistic
+            v-if="summaryState.status.value === 'success'"
+            label="项目状态"
+            value="进行中"
+          />
+          <n-statistic v-else-if="summaryState.isError.value" label="项目状态">
+            <template #default>
+              <span style="color: #d03050">异常</span>
+            </template>
+          </n-statistic>
+          <n-statistic v-else label="项目状态" value="加载中..." />
         </n-card>
       </n-gi>
     </n-grid>
+
+    <!-- 错误提示 -->
+    <n-alert v-if="summaryState.isError.value" type="error" closable @close="summaryState.reset()">
+      {{ summaryState.errorMessage.value }}
+    </n-alert>
 
     <!-- 任务列表 -->
     <ProTable
