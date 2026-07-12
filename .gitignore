@@ -17,9 +17,8 @@ dist-ssr
 .env.*.local
 
 # Test artifacts
-cypress/screenshots
-cypress/videos
-cypress/downloads
+test-results
+dist/playwright-report
 
 # Editor directories and files
 .vscode/*
@@ -31,6 +30,10 @@ cypress/downloads
 *.njsproj
 *.sln
 *.sw?
+
+# Auto-generated
+src/auto-imports.d.ts
+src/components.d.ts
 
 # OpenCode
 opencode.json

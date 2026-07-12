@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+  "agents": {
+    "sisyphus": {
+      "model": "mimo-v2.5-pro"
+    },
+    "hephaestus": {
+      "model": "mimo-v2.5-pro"
+    },
+    "oracle": {
+      "model": "mimo-v2.5-pro"
+    },
+    "explore": {
+      "model": "mimo-v2.5-pro"
+    },
+    "multimodal-looker": {
+      "model": "mimo-v2.5-pro"
+    },
+    "prometheus": {
+      "model": "mimo-v2.5-pro"
+    },
+    "metis": {
+      "model": "mimo-v2.5-pro"
+    },
+    "momus": {
+      "model": "mimo-v2.5-pro"
+    },
+    "atlas": {
+      "model": "mimo-v2.5-pro"
+    },
+    "sisyphus-junior": {
+      "model": "mimo-v2.5-pro"
+    },
+    "librarian": {
+      "model": "mimo-v2.5-pro"
+    }
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "mimo-v2.5-pro"
+    },
+    "ultrabrain": {
+      "model": "mimo-v2.5-pro"
+    },
+    "deep": {
+      "model": "mimo-v2.5-pro"
+    },
+    "artistry": {
+      "model": "mimo-v2.5-pro"
+    },
+    "quick": {
+      "model": "mimo-v2.5-pro"
+    },
+    "unspecified-low": {
+      "model": "mimo-v2.5-pro"
+    },
+    "unspecified-high": {
+      "model": "mimo-v2.5-pro"
+    },
+    "writing": {
+      "model": "mimo-v2.5-pro"
+    }
+  }
+}
