@@ -16,6 +16,9 @@ export type {
   PageQuery,
   PageResult,
   RetryRequestConfig,
+  ResponseParser,
+  EndpointConfig,
+  RequestConfig,
 } from './types'
 export type { ApiEndpoint, InferEndpointRequest, InferEndpointResponse } from './endpoint'
 export { setAccessTokenGetter, setUnauthorizedHandler } from './interceptors'

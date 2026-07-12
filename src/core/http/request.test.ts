@@ -101,6 +101,44 @@ describe('request', () => {
       kind: 'timeout',
     })
   })
+
+  it('rejects business error codes', async () => {
+    requestMock.mockResolvedValueOnce({
+      data: { code: 1001, message: 'Invalid parameter', data: null },
+    })
+
+    await expect(request({ url: '/x', method: 'get' })).rejects.toMatchObject({
+      kind: 'server',
+      status: 1001,
+    })
+  })
+
+  it('uses custom success code', async () => {
+    requestMock.mockResolvedValueOnce({
+      data: { code: 200, message: 'ok', data: { id: 3 } },
+    })
+
+    const result = await request<{ id: number }>({
+      url: '/x',
+      method: 'get',
+      endpoint: { successCode: 200 },
+    })
+    expect(result).toEqual({ id: 3 })
+  })
+
+  it('uses custom response parser', async () => {
+    requestMock.mockResolvedValueOnce({
+      data: { code: 0, message: 'ok', data: { items: [1, 2, 3] } },
+    })
+
+    const parser = (data: unknown) => (data as { items: number[] }).items
+    const result = await request<number[]>({
+      url: '/x',
+      method: 'get',
+      endpoint: { responseParser: parser },
+    })
+    expect(result).toEqual([1, 2, 3])
+  })
 })
 
 describe('http method wrappers', () => {

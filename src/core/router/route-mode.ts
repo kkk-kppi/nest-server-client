@@ -17,6 +17,39 @@ const componentMap: Record<string, () => Promise<Component>> = {
   DictManageView: () => import('@/features/system/views/DictManageView.vue'),
 }
 
+// Validate route config
+function validateRouteConfig(config: RouteConfig, usedNames: Set<string>): void {
+  // Validate path
+  if (!config.path || typeof config.path !== 'string') {
+    throw new Error(`Invalid route path: ${config.path}`)
+  }
+
+  // Validate component if provided
+  if (config.component && !(config.component in componentMap)) {
+    throw new Error(`Unknown component "${config.component}" in route "${config.path}"`)
+  }
+
+  // Validate unique name if provided
+  if (config.name) {
+    if (usedNames.has(config.name)) {
+      throw new Error(`Duplicate route name "${config.name}"`)
+    }
+    usedNames.add(config.name)
+  }
+
+  // Validate meta
+  if (!config.meta || !config.meta.title) {
+    throw new Error(`Missing required meta.title for route "${config.path}"`)
+  }
+
+  // Validate children recursively
+  if (config.children) {
+    for (const child of config.children) {
+      validateRouteConfig(child, usedNames)
+    }
+  }
+}
+
 // 将后端返回的路由配置转换为 Vue Router 路由记录
 function convertRouteConfig(config: RouteConfig): RouteRecordRaw {
   const route: Record<string, unknown> = {
@@ -43,10 +76,21 @@ function getFrontendDynamicRoutes(roles: UserRole[]): RouteRecordRaw[] {
 async function getBackendDynamicRoutes(): Promise<RouteRecordRaw[]> {
   try {
     const routeConfigs = await getRoutes()
+
+    // Validate all route configs before converting
+    const usedNames = new Set<string>()
+    for (const config of routeConfigs) {
+      validateRouteConfig(config, usedNames)
+    }
+
     return routeConfigs.map(convertRouteConfig)
   } catch (error) {
     console.error('[RouteMode] Failed to fetch routes from backend:', error)
-    return []
+    // Re-throw validation errors with original message
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Failed to load routes from backend')
   }
 }
 
