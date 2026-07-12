@@ -29,6 +29,7 @@ export interface RetryRequestConfig extends AxiosRequestConfig {
   dedupeKey?: string
   skipDedupeCancel?: boolean
   __dedupeKey?: string
+  __abortController?: AbortController
 }
 
 export type HttpError = AxiosError<ApiResponse<unknown>>

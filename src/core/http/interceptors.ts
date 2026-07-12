@@ -64,7 +64,12 @@ function removePendingRequest(config: RetryRequestConfig | undefined) {
     return
   }
 
-  pendingRequestMap.delete(dedupeKey)
+  // Compare-and-delete: only remove if the controller in the map is the same
+  // This prevents removing a newer request that replaced this one
+  const currentController = pendingRequestMap.get(dedupeKey)
+  if (currentController === config?.__abortController) {
+    pendingRequestMap.delete(dedupeKey)
+  }
 }
 
 function isRetriable(error: AxiosError<ApiResponse<unknown>>) {
@@ -80,6 +85,15 @@ function isRetriable(error: AxiosError<ApiResponse<unknown>>) {
   }
 
   return RETRY_STATUS.has(status)
+}
+
+function isCanceledError(error: AxiosError<ApiResponse<unknown>>): boolean {
+  return (
+    error.code === 'ERR_CANCELED' ||
+    error.name === 'CanceledError' ||
+    error.name === 'AbortError' ||
+    Boolean(error.message && error.message.includes('canceled'))
+  )
 }
 
 function isAllowedOrigin(url: string): boolean {
@@ -114,17 +128,34 @@ export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
   http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const retryConfig = config as RetryRequestConfig
     withRetryDefaults(retryConfig)
+
+    // Always create an AbortController for this request
+    const abortController = new AbortController()
+    retryConfig.__abortController = abortController
+
     if (!retryConfig.skipDedupeCancel) {
       const dedupeKey = createDedupeKey(retryConfig)
       const previousController = pendingRequestMap.get(dedupeKey)
+
+      // Only abort if there's a previous controller (deduplication)
       if (previousController) {
         previousController.abort()
       }
 
-      const abortController = new AbortController()
+      // Use caller's signal if provided, otherwise use our controller
+      if (retryConfig.signal) {
+        // Listen to caller's abort signal
+        retryConfig.signal.addEventListener?.('abort', () => {
+          abortController.abort()
+        })
+      }
+
       retryConfig.signal = abortController.signal
       retryConfig.__dedupeKey = dedupeKey
       pendingRequestMap.set(dedupeKey, abortController)
+    } else {
+      // For retry requests, use the abort controller directly
+      retryConfig.signal = abortController.signal
     }
 
     const accessToken = accessTokenGetter?.()
@@ -149,7 +180,15 @@ export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
       return response
     },
     async (error: AxiosError<ApiResponse<unknown>>) => {
-      removePendingRequest(error.config as RetryRequestConfig)
+      const config = error.config as RetryRequestConfig | undefined
+
+      // Don't retry canceled requests
+      if (isCanceledError(error)) {
+        removePendingRequest(config)
+        return Promise.reject(error)
+      }
+
+      removePendingRequest(config)
 
       if (error.response?.status === 401) {
         if (!unauthorizedHandling) {
@@ -170,7 +209,6 @@ export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
         return Promise.reject(error)
       }
 
-      const config = error.config as RetryRequestConfig | undefined
       const retry = config?.retry ?? 0
       const retryDelay = config?.retryDelay ?? DEFAULT_RETRY_DELAY
       const retryCount = config?.retryCount ?? 0
@@ -181,7 +219,15 @@ export function setupInterceptors(http: AxiosInstance, apiBaseUrl?: string) {
 
       config.retryCount = retryCount + 1
       await sleep(retryDelay * 2 ** retryCount)
-      config.skipDedupeCancel = true
+
+      // Re-register this request as the current pending request for deduplication
+      if (config.__dedupeKey) {
+        const newController = new AbortController()
+        config.__abortController = newController
+        config.signal = newController.signal
+        pendingRequestMap.set(config.__dedupeKey, newController)
+      }
+
       return http.request(config)
     },
   )
