@@ -6,7 +6,7 @@ import { i18n } from '@/core/i18n'
 import { setAccessTokenGetter, setUnauthorizedHandler } from '@/core/http'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import { clearDynamicRoutes } from '@/core/router/dynamic'
-import { initObservability } from '@/core/observability'
+import { initObservability, captureException, setUser } from '@/core/observability'
 import '../style.css'
 
 export async function bootstrap() {
@@ -27,11 +27,33 @@ export async function bootstrap() {
     router.replace({ name: 'login' })
   })
 
+  // Set up global error handler
   app.config.errorHandler = (err, _instance, info) => {
-    console.error('[Global Error]', err, info)
+    captureException(err instanceof Error ? err : new Error(String(err)), {
+      phase: 'vue',
+      info,
+    })
   }
 
+  // Set up unhandled rejection handler
+  window.addEventListener('unhandledrejection', (event) => {
+    captureException(
+      event.reason instanceof Error ? event.reason : new Error(String(event.reason)),
+      {
+        phase: 'unhandledrejection',
+      },
+    )
+  })
+
   await initObservability(app, router)
+
+  // Set user info for telemetry if authenticated
+  if (authStore.isAuthenticated) {
+    setUser({
+      id: authStore.accessToken || '',
+      username: 'authenticated-user',
+    })
+  }
 
   app.mount('#app')
 }

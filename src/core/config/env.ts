@@ -30,3 +30,11 @@ export const appEnv: AppEnv = {
   enableMock: env.VITE_ENABLE_MOCK === 'true',
   routeMode: (env.VITE_ROUTE_MODE as 'frontend' | 'backend') ?? 'frontend',
 }
+
+export function isDev(): boolean {
+  return env.DEV
+}
+
+export function isProd(): boolean {
+  return env.PROD
+}
