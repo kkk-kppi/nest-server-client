@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list'], ['html', { outputFolder: 'dist/playwright-report' }]],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -18,14 +18,28 @@ export default defineConfig({
       name: 'chromium',
       use: devices['Desktop Chrome'],
     },
-  ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    env: {
-      VITE_ENABLE_MOCK: 'true',
-      VITE_SENTRY_DSN: '',
+    {
+      name: 'mobile-chrome',
+      use: devices['Pixel 5'],
     },
-  },
+  ],
+  webServer: process.env.CI
+    ? {
+        command: 'pnpm preview',
+        url: 'http://localhost:4173',
+        reuseExistingServer: false,
+        env: {
+          VITE_ENABLE_MOCK: 'true',
+          VITE_SENTRY_DSN: '',
+        },
+      }
+    : {
+        command: 'pnpm dev',
+        url: 'http://localhost:5173',
+        reuseExistingServer: true,
+        env: {
+          VITE_ENABLE_MOCK: 'true',
+          VITE_SENTRY_DSN: '',
+        },
+      },
 })

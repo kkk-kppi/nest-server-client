@@ -13,6 +13,7 @@
     "lint": "eslint . --ext .js,.mjs,.cjs,.ts,.tsx,.vue && stylelint \"src/**/*.{css,scss}\"",
     "lint:fix": "eslint . --ext .js,.mjs,.cjs,.ts,.tsx,.vue --fix && stylelint \"src/**/*.{css,scss}\" --fix",
     "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "check:branch-name": "node scripts/validate-branch-name.mjs",
     "commitlint": "commitlint",
     "prepare": "husky",
