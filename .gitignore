@@ -41,5 +41,9 @@ opencode.json
 .opencode/plans
 .omo
 
+# Python
+__pycache__/
+*.pyc
+
 # Storybook
 storybook-static
