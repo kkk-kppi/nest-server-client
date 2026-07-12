@@ -29,7 +29,7 @@ type ExtractPathParams<TPath extends string> =
     ? { [K in Param]: string } & ExtractPathParams<Rest>
     : TPath extends `${string}:${infer Param}`
       ? { [K in Param]: string }
-      : Record<string, never>
+      : Record<string, string>
 
 // Structured endpoint call options
 type StructuredEndpointCallOptions<
