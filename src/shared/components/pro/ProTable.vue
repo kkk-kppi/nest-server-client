@@ -1,6 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { NDataTable, NCard, NSpace, NButton, NIcon, NTooltip, NInput, NSelect } from 'naive-ui'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import {
+  NDataTable,
+  NCard,
+  NSpace,
+  NButton,
+  NIcon,
+  NTooltip,
+  NInput,
+  NSelect,
+  NResult,
+} from 'naive-ui'
 import { RefreshOutline, ExpandOutline, ContractOutline } from '@vicons/ionicons5'
 import type { DataTableColumns, PaginationProps, SelectOption } from 'naive-ui'
 
@@ -17,14 +27,14 @@ interface RequestParams {
   [key: string]: string | number
 }
 
-interface RequestResult {
-  items: Record<string, unknown>[]
+interface RequestResult<TRow> {
+  items: TRow[]
   total: number
 }
 
-interface Props {
-  columns: DataTableColumns
-  request: (params: RequestParams) => Promise<RequestResult>
+interface Props<TRow = Record<string, unknown>> {
+  columns: DataTableColumns<TRow>
+  request: (params: RequestParams) => Promise<RequestResult<TRow>>
   searchFields?: SearchField[]
   pagination?: boolean
   pageSize?: number
@@ -55,6 +65,8 @@ const searchValues = ref<Record<string, string | number | undefined>>({})
 const currentPage = ref(1)
 const currentPageSize = ref(props.pageSize)
 const isFullscreen = ref(false)
+const error = ref<Error | null>(null)
+const requestId = ref(0)
 
 function getSearchValue(key: string): string | number | undefined {
   return searchValues.value[key] as string | number | undefined
@@ -88,19 +100,29 @@ const tablePagination = computed<PaginationProps>(() => ({
 }))
 
 async function fetchData() {
+  const currentRequestId = ++requestId.value
   loading.value = true
+  error.value = null
   try {
     const result = await props.request({
       page: currentPage.value,
       pageSize: currentPageSize.value,
       ...searchValues.value,
     })
-    tableData.value = result.items
+    if (currentRequestId !== requestId.value) {
+      return
+    }
+    tableData.value = result.items as Record<string, unknown>[]
     total.value = result.total
   } catch (e) {
-    console.error('[ProTable] Failed to fetch data:', e)
+    if (currentRequestId !== requestId.value) {
+      return
+    }
+    error.value = e instanceof Error ? e : new Error(String(e))
   } finally {
-    loading.value = false
+    if (currentRequestId === requestId.value) {
+      loading.value = false
+    }
   }
 }
 
@@ -131,13 +153,28 @@ function handleRefresh() {
   fetchData()
 }
 
-defineExpose({
-  refresh: fetchData,
-  reset: handleReset,
-})
+function handleRetry() {
+  fetchData()
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullscreen.value) {
+    isFullscreen.value = false
+  }
+}
 
 onMounted(() => {
   fetchData()
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
+
+defineExpose({
+  refresh: fetchData,
+  reset: handleReset,
 })
 </script>
 
@@ -189,7 +226,7 @@ onMounted(() => {
       <n-space>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button quaternary circle @click="handleRefresh">
+            <n-button quaternary circle aria-label="刷新数据" @click="handleRefresh">
               <template #icon>
                 <n-icon><RefreshOutline /></n-icon>
               </template>
@@ -199,7 +236,13 @@ onMounted(() => {
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button quaternary circle @click="toggleFullscreen">
+            <n-button
+              quaternary
+              circle
+              :aria-pressed="isFullscreen"
+              :aria-label="isFullscreen ? '退出全屏' : '进入全屏'"
+              @click="toggleFullscreen"
+            >
               <template #icon>
                 <n-icon>
                   <ContractOutline v-if="isFullscreen" />
@@ -208,16 +251,28 @@ onMounted(() => {
               </template>
             </n-button>
           </template>
-          全屏
+          {{ isFullscreen ? '退出全屏' : '全屏' }}
         </n-tooltip>
       </n-space>
     </div>
 
+    <n-result
+      v-if="error && !tableData.length"
+      status="error"
+      title="加载失败"
+      :description="error.message"
+    >
+      <template #footer>
+        <n-button data-testid="retry-button" @click="handleRetry"> 重试 </n-button>
+      </template>
+    </n-result>
+
     <n-data-table
+      v-else
       :columns="columns"
       :data="tableData"
       :loading="loading"
-      :pagination="tablePagination"
+      :pagination="props.pagination ? tablePagination : false"
       :row-key="getRowKeyValue"
       :bordered="false"
       striped
