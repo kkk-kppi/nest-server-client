@@ -1,0 +1,5 @@
+export { usePermission } from './usePermission'
+export { canAccess } from './permission'
+export type { AccessMeta } from './permission'
+export type { UserRole } from './store/useAuthStore'
+export { default as AccessControl } from './components/AccessControl.vue'
