@@ -223,7 +223,7 @@ async function handleSubmit() {
     v-model:show="showModal"
     preset="dialog"
     :title="editingUser ? t('system.user.editUser') : t('system.user.addUser')"
-    style="width: 500px"
+    class="user-modal"
   >
     <ProForm
       ref="proFormRef"
@@ -247,3 +247,9 @@ async function handleSubmit() {
     </ProForm>
   </n-modal>
 </template>
+
+<style scoped>
+.user-modal {
+  width: 500px;
+}
+</style>

@@ -41,7 +41,7 @@ const recentActivities = [
           </template>
           <n-statistic label="用户总数" :value="1024">
             <template #suffix>
-              <n-tag type="success" size="small" style="margin-left: var(--space-2)">+12%</n-tag>
+              <n-tag type="success" size="small" class="ml-2">+12%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -53,7 +53,7 @@ const recentActivities = [
           </template>
           <n-statistic label="今日访问" :value="56789">
             <template #suffix>
-              <n-tag type="info" size="small" style="margin-left: var(--space-2)">+8%</n-tag>
+              <n-tag type="info" size="small" class="ml-2">+8%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -65,7 +65,7 @@ const recentActivities = [
           </template>
           <n-statistic label="订单数量" :value="256">
             <template #suffix>
-              <n-tag type="warning" size="small" style="margin-left: var(--space-2)">+5%</n-tag>
+              <n-tag type="warning" size="small" class="ml-2">+5%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -77,10 +77,10 @@ const recentActivities = [
           </template>
           <n-statistic label="总收入">
             <template #default>
-              <span style="color: var(--color-error)">¥123,456</span>
+              <span class="text-error">¥123,456</span>
             </template>
             <template #suffix>
-              <n-tag type="error" size="small" style="margin-left: var(--space-2)">+15%</n-tag>
+              <n-tag type="error" size="small" class="ml-2">+15%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -145,13 +145,11 @@ const recentActivities = [
                   </n-icon>
                 </template>
                 <template #header>
-                  <span style="font-weight: var(--font-medium)">{{ activity.user }}</span>
+                  <span class="font-medium">{{ activity.user }}</span>
                 </template>
                 <template #description>
                   <span>{{ activity.action }}</span>
-                  <n-tag :type="activity.type" size="small" style="margin-left: var(--space-2)">{{
-                    activity.time
-                  }}</n-tag>
+                  <n-tag :type="activity.type" size="small" class="ml-2">{{ activity.time }}</n-tag>
                 </template>
               </n-thing>
             </n-list-item>

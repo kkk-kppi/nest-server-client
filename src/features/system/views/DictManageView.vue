@@ -260,7 +260,7 @@ onMounted(() => {
         @row-click="handleTypeSelect"
       />
     </n-card>
-    <n-card title="字典数据" :bordered="false" style="flex: 1">
+    <n-card title="字典数据" :bordered="false" class="dict-data-card">
       <template #header-extra>
         <n-button type="primary" size="small" :disabled="!selectedType" @click="handleAddData">
           新增
@@ -284,7 +284,7 @@ onMounted(() => {
     v-model:show="showTypeModal"
     preset="dialog"
     :title="editingType ? '编辑字典类型' : '新增字典类型'"
-    style="width: 500px"
+    class="dict-modal"
   >
     <n-form :model="typeFormValue" label-width="80">
       <n-form-item label="字典名称"><n-input v-model:value="typeFormValue.name" /></n-form-item>
@@ -312,7 +312,7 @@ onMounted(() => {
     v-model:show="showDataModal"
     preset="dialog"
     :title="editingData ? '编辑字典数据' : '新增字典数据'"
-    style="width: 500px"
+    class="dict-modal"
   >
     <n-form :model="dataFormValue" label-width="80">
       <n-form-item label="标签"><n-input v-model:value="dataFormValue.label" /></n-form-item>
@@ -340,5 +340,13 @@ onMounted(() => {
 <style scoped>
 .selected-row {
   background-color: var(--n-merged-row-color-hover) !important;
+}
+
+.dict-data-card {
+  flex: 1;
+}
+
+.dict-modal {
+  width: 500px;
 }
 </style>

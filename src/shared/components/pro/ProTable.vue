@@ -183,12 +183,8 @@ defineExpose({
 </script>
 
 <template>
-  <n-card
-    :title="title"
-    :bordered="false"
-    :style="isFullscreen ? 'position: fixed; inset: 0; z-index: 999; overflow: auto;' : ''"
-  >
-    <div v-if="searchFields.length" style="margin-bottom: 16px">
+  <n-card :title="title" :bordered="false" :class="{ 'pro-table-fullscreen': isFullscreen }">
+    <div v-if="searchFields.length" class="search-bar">
       <n-space align="center">
         <template v-for="field in searchFields" :key="field.key">
           <n-input
@@ -196,7 +192,7 @@ defineExpose({
             :value="getInputValue(field.key)"
             :placeholder="field.label"
             clearable
-            style="width: 200px"
+            class="search-input"
             @update:value="(val: string) => (searchValues[field.key] = val)"
             @keyup.enter="handleSearch"
           />
@@ -206,7 +202,7 @@ defineExpose({
             :placeholder="field.label"
             :options="field.options || []"
             clearable
-            style="width: 200px"
+            class="search-input"
             @update:value="(val: string | number) => (searchValues[field.key] = val)"
           />
         </template>
@@ -215,15 +211,7 @@ defineExpose({
       </n-space>
     </div>
 
-    <div
-      v-if="toolbar"
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-      "
-    >
+    <div v-if="toolbar" class="toolbar">
       <n-space>
         <slot name="toolbar" />
       </n-space>
@@ -287,3 +275,27 @@ defineExpose({
     <slot name="extra" />
   </n-card>
 </template>
+
+<style scoped>
+.pro-table-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  overflow: auto;
+}
+
+.search-bar {
+  margin-bottom: var(--space-4);
+}
+
+.search-input {
+  width: 200px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+</style>

@@ -34,7 +34,7 @@ function handleReset() {
 </script>
 
 <template>
-  <div style="margin-bottom: 16px">
+  <div class="search-bar">
     <n-space align="center">
       <template v-for="field in fields.slice(0, expanded ? fields.length : 3)" :key="field.key">
         <n-input
@@ -42,7 +42,7 @@ function handleReset() {
           v-model:value="searchValues[field.key]"
           :placeholder="field.label"
           clearable
-          style="width: 200px"
+          class="search-input"
           @keyup.enter="handleSearch"
         />
         <n-select
@@ -51,7 +51,7 @@ function handleReset() {
           :placeholder="field.label"
           :options="field.options || []"
           clearable
-          style="width: 200px"
+          class="search-input"
         />
       </template>
       <n-button type="primary" @click="handleSearch">
@@ -72,3 +72,13 @@ function handleReset() {
     </n-space>
   </div>
 </template>
+
+<style scoped>
+.search-bar {
+  margin-bottom: var(--space-4);
+}
+
+.search-input {
+  width: 200px;
+}
+</style>

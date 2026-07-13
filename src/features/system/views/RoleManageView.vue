@@ -131,7 +131,7 @@ async function handleSubmit() {
     v-model:show="showModal"
     preset="dialog"
     :title="editingRole ? '编辑角色' : '新增角色'"
-    style="width: 500px"
+    class="role-modal"
   >
     <n-form :model="formValue" label-width="80">
       <n-form-item label="角色名称"><n-input v-model:value="formValue.name" /></n-form-item>
@@ -155,3 +155,9 @@ async function handleSubmit() {
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.role-modal {
+  width: 500px;
+}
+</style>

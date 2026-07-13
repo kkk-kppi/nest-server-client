@@ -32,8 +32,8 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div style="display: grid; place-items: center; min-height: 100vh; background: var(--body-color)">
-    <n-card title="登录" style="width: 400px">
+  <div class="login-container">
+    <n-card title="登录" class="login-card">
       <n-form :model="formValue">
         <n-form-item label="角色">
           <n-select v-model:value="formValue.role" :options="roleOptions" />
@@ -50,3 +50,16 @@ async function handleLogin() {
     </n-card>
   </div>
 </template>
+
+<style scoped>
+.login-container {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: var(--body-color);
+}
+
+.login-card {
+  width: 400px;
+}
+</style>

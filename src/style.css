@@ -20,7 +20,11 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: var(--font-medium);
   color: var(--text-primary);
@@ -35,6 +39,7 @@ h1 {
     margin: var(--space-5) 0;
   }
 }
+
 h2 {
   font-size: var(--text-2xl);
   line-height: var(--leading-tight);
@@ -43,6 +48,30 @@ h2 {
   @media (max-width: 1024px) {
     font-size: var(--text-xl);
   }
+}
+
+h3 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  margin: 0 0 var(--space-2);
+}
+
+h4 {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  margin: 0 0 var(--space-1);
+}
+
+h5 {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  margin: 0 0 var(--space-1);
+}
+
+h6 {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  margin: 0 0 var(--space-1);
 }
 p {
   margin: 0;
@@ -254,5 +283,43 @@ code {
   &::after {
     right: 0;
     border-right-color: var(--border-light);
+  }
+}
+
+/* 全局按钮样式 */
+button {
+  cursor: pointer;
+  transition: all var(--duration-fast) ease-out;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* 全局链接样式 */
+a {
+  transition: color var(--duration-fast) ease-out;
+
+  &:hover {
+    color: var(--color-primary-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 }

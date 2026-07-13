@@ -160,7 +160,7 @@ onMounted(() => {
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#18a058"><FolderOpenOutline /></n-icon>
+            <n-icon size="24" color="var(--color-success)"><FolderOpenOutline /></n-icon>
           </template>
           <n-statistic
             v-if="summaryState.status.value === 'success'"
@@ -169,7 +169,7 @@ onMounted(() => {
           />
           <n-statistic v-else-if="summaryState.isError.value" label="项目名称">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="项目名称" value="-" />
@@ -178,7 +178,7 @@ onMounted(() => {
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
+            <n-icon size="24" color="var(--color-primary)"><PeopleOutline /></n-icon>
           </template>
           <n-statistic
             v-if="summaryState.status.value === 'success'"
@@ -187,7 +187,7 @@ onMounted(() => {
           />
           <n-statistic v-else-if="summaryState.isError.value" label="负责人">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="负责人" value="-" />
@@ -196,7 +196,7 @@ onMounted(() => {
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#f0a020"><TimeOutline /></n-icon>
+            <n-icon size="24" color="var(--color-warning)"><TimeOutline /></n-icon>
           </template>
           <n-statistic
             v-if="summaryState.status.value === 'success'"
@@ -205,7 +205,7 @@ onMounted(() => {
           />
           <n-statistic v-else-if="summaryState.isError.value" label="任务总数">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="任务总数" :value="0" />
@@ -214,7 +214,7 @@ onMounted(() => {
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#18a058"><CheckmarkCircleOutline /></n-icon>
+            <n-icon size="24" color="var(--color-success)"><CheckmarkCircleOutline /></n-icon>
           </template>
           <n-statistic
             v-if="summaryState.status.value === 'success'"
@@ -223,7 +223,7 @@ onMounted(() => {
           />
           <n-statistic v-else-if="summaryState.isError.value" label="项目状态">
             <template #default>
-              <span style="color: #d03050">异常</span>
+              <span class="text-error">异常</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="项目状态" value="加载中..." />
@@ -260,7 +260,7 @@ onMounted(() => {
     v-model:show="showModal"
     preset="dialog"
     :title="editingTask ? '编辑任务' : '新增任务'"
-    style="width: 500px"
+    class="task-modal"
   >
     <n-form :model="formValue" label-width="80">
       <n-form-item label="任务名称" required>
@@ -283,3 +283,9 @@ onMounted(() => {
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.task-modal {
+  width: 500px;
+}
+</style>

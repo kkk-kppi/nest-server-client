@@ -32,10 +32,10 @@ async function loginBy(role: UserRole) {
 </script>
 
 <template>
-  <div style="padding-bottom: 24px">
+  <div class="home-container">
     <HomeHeroPanel />
     <AppPageLayout>
-      <div style="display: flex; gap: 8px; justify-content: center">
+      <div class="button-group">
         <button type="button" :disabled="isSubmitting" @click="loginBy('viewer')">
           Login Viewer
         </button>
@@ -47,11 +47,34 @@ async function loginBy(role: UserRole) {
         </button>
         <button type="button" @click="logout">Logout</button>
       </div>
-      <div style="display: flex; gap: 16px; justify-content: center">
+      <div class="link-group">
         <RouterLink to="/workspace">Go Workspace</RouterLink>
         <RouterLink to="/admin">Go Admin</RouterLink>
       </div>
-      <p v-if="loginError" style="text-align: center; color: #d33">{{ loginError }}</p>
+      <p v-if="loginError" class="login-error">{{ loginError }}</p>
     </AppPageLayout>
   </div>
 </template>
+
+<style scoped>
+.home-container {
+  padding-bottom: var(--space-6);
+}
+
+.button-group {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.link-group {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+}
+
+.login-error {
+  text-align: center;
+  color: var(--color-error);
+}
+</style>

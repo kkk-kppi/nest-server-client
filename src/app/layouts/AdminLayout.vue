@@ -33,6 +33,9 @@ onUnmounted(() => {
 
 <template>
   <n-layout has-sider class="admin-layout">
+    <!-- Skip Navigation 链接 -->
+    <a href="#main-content" class="skip-link">跳到主内容</a>
+
     <!-- 移动端遮罩 -->
     <div
       v-if="isMobile && showMobileSidebar"
@@ -40,41 +43,43 @@ onUnmounted(() => {
       @click="showMobileSidebar = false"
     />
 
-    <n-layout-sider
-      v-if="setting.mode === 'side'"
-      :collapsed="isMobile ? !showMobileSidebar : setting.sidebarCollapsed"
-      :width="isMobile ? 240 : setting.sidebarWidth"
-      :collapsed-width="isMobile ? 0 : 64"
-      :show-trigger="!isMobile"
-      collapse-mode="width"
-      bordered
-      :class="{ 'mobile-sidebar': isMobile }"
-      @collapse="isMobile ? (showMobileSidebar = false) : (setting.sidebarCollapsed = true)"
-      @expand="isMobile ? (showMobileSidebar = true) : (setting.sidebarCollapsed = false)"
-    >
-      <AdminSidebar
-        :menu-options="menuOptions"
-        :collapsed="!showMobileSidebar && !isMobile ? setting.sidebarCollapsed : false"
-      />
-    </n-layout-sider>
+    <aside v-if="setting.mode === 'side'" aria-label="侧边栏导航">
+      <n-layout-sider
+        :collapsed="isMobile ? !showMobileSidebar : setting.sidebarCollapsed"
+        :width="isMobile ? 240 : setting.sidebarWidth"
+        :collapsed-width="isMobile ? 0 : 64"
+        :show-trigger="!isMobile"
+        collapse-mode="width"
+        bordered
+        :class="{ 'mobile-sidebar': isMobile }"
+        @collapse="isMobile ? (showMobileSidebar = false) : (setting.sidebarCollapsed = true)"
+        @expand="isMobile ? (showMobileSidebar = true) : (setting.sidebarCollapsed = false)"
+      >
+        <AdminSidebar
+          :menu-options="menuOptions"
+          :collapsed="!showMobileSidebar && !isMobile ? setting.sidebarCollapsed : false"
+        />
+      </n-layout-sider>
+    </aside>
 
-    <n-layout-sider
-      v-if="setting.mode === 'mix'"
-      :collapsed="isMobile ? !showMobileSidebar : setting.sidebarCollapsed"
-      :width="isMobile ? 240 : setting.sidebarWidth"
-      :collapsed-width="isMobile ? 0 : 64"
-      :show-trigger="!isMobile"
-      collapse-mode="width"
-      bordered
-      :class="{ 'mobile-sidebar': isMobile }"
-      @collapse="isMobile ? (showMobileSidebar = false) : (setting.sidebarCollapsed = true)"
-      @expand="isMobile ? (showMobileSidebar = true) : (setting.sidebarCollapsed = false)"
-    >
-      <AdminSidebar
-        :menu-options="subMenuOptions"
-        :collapsed="!showMobileSidebar && !isMobile ? setting.sidebarCollapsed : false"
-      />
-    </n-layout-sider>
+    <aside v-if="setting.mode === 'mix'" aria-label="侧边栏导航">
+      <n-layout-sider
+        :collapsed="isMobile ? !showMobileSidebar : setting.sidebarCollapsed"
+        :width="isMobile ? 240 : setting.sidebarWidth"
+        :collapsed-width="isMobile ? 0 : 64"
+        :show-trigger="!isMobile"
+        collapse-mode="width"
+        bordered
+        :class="{ 'mobile-sidebar': isMobile }"
+        @collapse="isMobile ? (showMobileSidebar = false) : (setting.sidebarCollapsed = true)"
+        @expand="isMobile ? (showMobileSidebar = true) : (setting.sidebarCollapsed = false)"
+      >
+        <AdminSidebar
+          :menu-options="subMenuOptions"
+          :collapsed="!showMobileSidebar && !isMobile ? setting.sidebarCollapsed : false"
+        />
+      </n-layout-sider>
+    </aside>
 
     <n-layout>
       <n-layout-header :bordered="false" class="admin-header">
@@ -92,15 +97,17 @@ onUnmounted(() => {
         <AdminTabs />
       </n-layout-header>
 
-      <n-layout-content
-        :content-style="
-          setting.fixedHeader
-            ? 'padding: var(--space-4); flex: 1; overflow: auto;'
-            : 'padding: var(--space-4);'
-        "
-      >
-        <router-view />
-      </n-layout-content>
+      <main id="main-content">
+        <n-layout-content
+          :content-style="
+            setting.fixedHeader
+              ? 'padding: var(--space-4); flex: 1; overflow: auto;'
+              : 'padding: var(--space-4);'
+          "
+        >
+          <router-view />
+        </n-layout-content>
+      </main>
     </n-layout>
   </n-layout>
 </template>
@@ -116,10 +123,7 @@ onUnmounted(() => {
 
 .mobile-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: var(--bg-overlay);
   z-index: var(--z-modal-backdrop);
 }

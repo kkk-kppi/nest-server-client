@@ -9,6 +9,7 @@ import { clearDynamicRoutes } from '@/core/router/dynamic'
 import { initObservability, captureException, setUser } from '@/core/observability'
 import '../styles/tokens.css'
 import '../style.css'
+import '../styles/utilities.css'
 
 export async function bootstrap() {
   const app = createApp(AppRoot)

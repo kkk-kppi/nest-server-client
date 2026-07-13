@@ -162,7 +162,7 @@ defineExpose({
             :value="getNumberValue(field.key)"
             :placeholder="field.placeholder"
             :disabled="field.disabled || disabled"
-            style="width: 100%"
+            class="full-width"
             v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
@@ -217,7 +217,7 @@ defineExpose({
             v-else-if="field.type === 'date'"
             :value="getNumberValue(field.key)"
             :disabled="field.disabled || disabled"
-            style="width: 100%"
+            class="full-width"
             v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
@@ -227,7 +227,7 @@ defineExpose({
             v-else-if="field.type === 'time'"
             :value="getNumberValue(field.key)"
             :disabled="field.disabled || disabled"
-            style="width: 100%"
+            class="full-width"
             v-bind="field.props"
             @update:value="updateField(field.key, $event)"
           />
@@ -239,3 +239,9 @@ defineExpose({
     <slot name="action" />
   </n-form>
 </template>
+
+<style scoped>
+.full-width {
+  width: 100%;
+}
+</style>
