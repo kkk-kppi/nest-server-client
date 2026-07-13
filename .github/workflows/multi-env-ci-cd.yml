@@ -106,6 +106,7 @@ jobs:
           echo "VITE_BUILD_PRESET=$PRESET" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test:coverage
       - run: pnpm verify:api

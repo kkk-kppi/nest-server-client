@@ -1,5 +1,12 @@
 module.exports = {
   extends: ['stylelint-config-standard'],
+  customSyntax: 'postcss-html',
+  overrides: [
+    {
+      files: ['**/*.vue'],
+      customSyntax: 'postcss-html',
+    },
+  ],
   rules: {
     'selector-class-pattern': null,
     'no-descending-specificity': null,
