@@ -20,7 +20,7 @@ pnpm test:coverage    # Vitest with coverage
 pnpm verify:api       # typecheck + API layer tests (src/core/http/ src/mocks/)
 pnpm build            # typecheck + vite build (outputs to dist/)
 pnpm e2e              # Playwright E2E tests
-pnpm e2e:open         # Playwright interactive
+pnpm e2e:ui           # Playwright interactive
 pnpm build-storybook  # Build Storybook
 ```
 

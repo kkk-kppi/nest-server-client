@@ -10,7 +10,8 @@ pnpm install          # 安装依赖
 pnpm dev              # 启动开发服务器（Vite HMR）
 pnpm build            # 类型检查 + 生产构建（输出到 dist/）
 pnpm test             # 运行单元测试（Vitest）
-pnpm e2e:open         # 打开 Cypress E2E 测试
+pnpm e2e              # 运行 Playwright E2E 测试
+pnpm e2e:ui           # 打开 Playwright 交互式调试
 ```
 
 ## 环境变量
@@ -28,20 +29,22 @@ pnpm e2e:open         # 打开 Cypress E2E 测试
 src/
 ├── app/           # 组装层：bootstrap、布局、根组件
 ├── core/          # 基础设施层：HTTP、路由、Store、配置
-├── features/      # 业务域模块：auth、admin、workspace
+├── features/      # 业务域模块：auth、admin、workspace、system
 ├── shared/        # 跨域共享：composables、原子组件、工具函数
 └── mocks/         # MSW 浏览器端 Mock（handlers、worker）
 ```
 
 ## 文档
 
-- [企业级前端架构路线图](./doc/企业级前端架构路线图.md)
-- [Docker 部署与运行指南](./doc/Docker部署与运行指南.md)
-- [Vite 分包策略与性能预算治理](./doc/Vite分包策略与性能预算治理.md)
-- [API MOCK 指南和接入说明](./doc/API%20MOCK指南和接入说明.md)
-- [E2E 测试与接入指南](./doc/E2E测试与接入指南.md)
-- [环境变量提交规范](./doc/环境变量提交规范.md)
-- [分支规范文档](./doc/分支规范文档.md)
+- [企业级前端架构路线图](./docs/企业级前端架构路线图.md)
+- [Docker 部署与运行指南](./docs/Docker部署与运行指南.md)
+- [Vite 分包策略与性能预算治理](./docs/Vite分包策略与性能预算治理.md)
+- [API MOCK 指南和接入说明](./docs/API%20MOCK指南和接入说明.md)
+- [E2E 测试与接入指南](./docs/E2E测试与接入指南.md)
+- [业务模块接入指南](./docs/业务模块接入指南.md)
+- [环境变量提交规范](./docs/环境变量提交规范.md)
+- [分支规范文档](./docs/分支规范文档.md)
+- [多环境 CI-CD 接入说明](./docs/多环境CI-CD接入说明.md)
 - [ADR 架构决策记录](./docs/adr/)
 
 ## 常用命令
@@ -52,8 +55,12 @@ src/
 | `pnpm lint:fix`        | 自动修复 lint 问题      |
 | `pnpm typecheck`       | TypeScript 类型检查     |
 | `pnpm format`          | Prettier 格式化         |
+| `pnpm format:check`    | Prettier 只读检查（CI） |
+| `pnpm test`            | 单元测试（Vitest）      |
 | `pnpm test:coverage`   | 单元测试 + 覆盖率报告   |
 | `pnpm verify:api`      | typecheck + API 层单测  |
+| `pnpm e2e`             | Playwright E2E 测试     |
+| `pnpm e2e:ui`          | Playwright 交互式调试   |
 | `pnpm storybook`       | 启动 Storybook 组件文档 |
 | `pnpm build-storybook` | 构建 Storybook 静态站点 |
 
@@ -64,7 +71,7 @@ src/
 - **路由**：Vue Router 4
 - **状态**：Pinia + persistedstate
 - **请求**：Axios
-- **测试**：Vitest + Vue Test Utils + Cypress
+- **测试**：Vitest + Vue Test Utils + Playwright
 - **组件文档**：Storybook
 
 ## 许可证
