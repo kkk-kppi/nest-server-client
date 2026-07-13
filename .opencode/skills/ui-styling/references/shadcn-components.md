@@ -36,7 +36,6 @@ Sizes: `default | sm | lg | icon`
 ```tsx
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
 ;<div className="space-y-2">
   <Label htmlFor="email">Email</Label>
   <Input id="email" type="email" placeholder="you@example.com" />
@@ -104,7 +103,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-
 ;<Select>
   <SelectTrigger className="w-[180px]">
     <SelectValue placeholder="Theme" />
@@ -122,7 +120,6 @@ import {
 ```tsx
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-
 ;<div className="flex items-center space-x-2">
   <Checkbox id="terms" />
   <Label htmlFor="terms">Accept terms</Label>
@@ -134,7 +131,6 @@ import { Label } from '@/components/ui/label'
 ```tsx
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-
 ;<RadioGroup defaultValue="option-one">
   <div className="flex items-center space-x-2">
     <RadioGroupItem value="option-one" id="option-one" />
@@ -151,7 +147,6 @@ import { Label } from '@/components/ui/label'
 
 ```tsx
 import { Textarea } from '@/components/ui/textarea'
-
 ;<Textarea placeholder="Type your message here." />
 ```
 
@@ -160,7 +155,6 @@ import { Textarea } from '@/components/ui/textarea'
 ```tsx
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-
 ;<div className="flex items-center space-x-2">
   <Switch id="airplane-mode" />
   <Label htmlFor="airplane-mode">Airplane Mode</Label>
@@ -205,7 +199,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-
 ;<Card>
   <CardHeader>
     <CardTitle>Card Title</CardTitle>
@@ -224,7 +217,6 @@ import {
 
 ```tsx
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
 ;<Tabs defaultValue="account">
   <TabsList>
     <TabsTrigger value="account">Account</TabsTrigger>
@@ -244,7 +236,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-
 ;<Accordion type="single" collapsible>
   <AccordionItem value="item-1">
     <AccordionTrigger>Is it accessible?</AccordionTrigger>
@@ -268,7 +259,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
-
 ;<NavigationMenu>
   <NavigationMenuList>
     <NavigationMenuItem>
@@ -295,7 +285,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-
 ;<Dialog>
   <DialogTrigger asChild>
     <Button>Open</Button>
@@ -322,7 +311,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-
 ;<Drawer>
   <DrawerTrigger>Open</DrawerTrigger>
   <DrawerContent>
@@ -342,7 +330,6 @@ import {
 
 ```tsx
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-
 ;<Popover>
   <PopoverTrigger>Open</PopoverTrigger>
   <PopoverContent>Content here</PopoverContent>
@@ -378,7 +365,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-
 ;<Command>
   <CommandInput placeholder="Type a command or search..." />
   <CommandList>
@@ -406,7 +392,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-
 ;<AlertDialog>
   <AlertDialogTrigger asChild>
     <Button variant="destructive">Delete</Button>
@@ -448,7 +433,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 ```tsx
 import { Progress } from '@/components/ui/progress'
-
 ;<Progress value={33} />
 ```
 
@@ -456,7 +440,6 @@ import { Progress } from '@/components/ui/progress'
 
 ```tsx
 import { Skeleton } from '@/components/ui/skeleton'
-
 ;<div className="flex items-center space-x-4">
   <Skeleton className="h-12 w-12 rounded-full" />
   <div className="space-y-2">
@@ -480,7 +463,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 ;<Table>
   <TableCaption>Recent invoices</TableCaption>
   <TableHeader>
@@ -504,7 +486,6 @@ import {
 
 ```tsx
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
 ;<Avatar>
   <AvatarImage src="https://github.com/shadcn.png" />
   <AvatarFallback>CN</AvatarFallback>

@@ -44,7 +44,6 @@ Dialogs trap focus automatically via Radix Dialog primitive:
 
 ```tsx
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-
 ;<Dialog>
   <DialogTrigger>Open</DialogTrigger>
   <DialogContent>
@@ -72,7 +71,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
 ;<DropdownMenu>
   <DropdownMenuTrigger>Open</DropdownMenuTrigger>
   <DropdownMenuContent>
@@ -94,7 +92,6 @@ Keyboard shortcuts:
 
 ```tsx
 import { Command } from '@/components/ui/command'
-
 ;<Command>
   <CommandInput placeholder="Search..." />
   <CommandList>
@@ -211,7 +208,6 @@ toast({
 ```tsx
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-
 ;<div>
   <Label htmlFor="email">Email</Label>
   <Input id="email" type="email" />
@@ -222,7 +218,6 @@ import { Input } from '@/components/ui/input'
 
 ```tsx
 import { FormDescription, FormMessage } from '@/components/ui/form'
-
 ;<FormItem>
   <FormLabel>Username</FormLabel>
   <FormControl>
@@ -289,7 +284,6 @@ Group related fields:
 
 ```tsx
 import { Accordion } from '@/components/ui/accordion'
-
 ;<Accordion type="single" collapsible>
   <AccordionItem value="item-1">
     <AccordionTrigger>
@@ -308,7 +302,6 @@ import { Accordion } from '@/components/ui/accordion'
 
 ```tsx
 import { Tabs } from '@/components/ui/tabs'
-
 ;<Tabs defaultValue="account">
   <TabsList role="tablist">
     {/* Arrow keys navigate, Space/Enter activates */}
@@ -326,7 +319,6 @@ import { Tabs } from '@/components/ui/tabs'
 
 ```tsx
 import { Select } from '@/components/ui/select'
-
 ;<Select>
   <SelectTrigger aria-label="Choose theme">
     <SelectValue placeholder="Theme" />
@@ -358,7 +350,6 @@ import { Label } from "@/components/ui/label"
 
 ```tsx
 import { Alert } from '@/components/ui/alert'
-
 ;<Alert role="alert">
   {/* Announced immediately to screen readers */}
   <AlertTitle>Error</AlertTitle>

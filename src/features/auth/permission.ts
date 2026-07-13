@@ -5,11 +5,7 @@ export interface AccessMeta {
   permissions?: string[]
 }
 
-export function canAccess(
-  roles: UserRole[],
-  permissions: string[],
-  meta: AccessMeta | undefined,
-) {
+export function canAccess(roles: UserRole[], permissions: string[], meta: AccessMeta | undefined) {
   if (!meta) {
     return true
   }
