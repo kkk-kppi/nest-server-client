@@ -50,7 +50,7 @@ function handleClose(name: string) {
   <n-tabs
     :value="activeTab"
     type="card"
-    style="padding: 4px 0"
+    class="admin-tabs"
     @update:value="handleTabChange"
     @close="handleClose"
   >
@@ -63,3 +63,9 @@ function handleClose(name: string) {
     />
   </n-tabs>
 </template>
+
+<style scoped>
+.admin-tabs {
+  padding: var(--space-1) 0;
+}
+</style>

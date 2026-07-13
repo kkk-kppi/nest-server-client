@@ -133,11 +133,11 @@ onMounted(() => {
 <template>
   <n-space vertical :size="16">
     <!-- 仪表盘统计卡片 -->
-    <n-grid :cols="4" :x-gap="16" :y-gap="16">
-      <n-gi>
+    <n-grid :cols="4" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
+            <n-icon size="24" color="var(--color-primary)"><PeopleOutline /></n-icon>
           </template>
           <n-statistic
             v-if="dashboardState.status.value === 'success'"
@@ -146,36 +146,36 @@ onMounted(() => {
           />
           <n-statistic v-else-if="dashboardState.isError.value" label="在线用户">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="在线用户" :value="0" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#d03050"><WarningOutline /></n-icon>
+            <n-icon size="24" color="var(--color-error)"><WarningOutline /></n-icon>
           </template>
           <n-statistic v-if="dashboardState.status.value === 'success'" label="错误率">
             <template #default>
-              <span :style="{ color: (dashboard?.errorRate ?? 0) > 0.1 ? '#d03050' : '#18a058' }">
+              <span :class="(dashboard?.errorRate ?? 0) > 0.1 ? 'text-error' : 'text-success'">
                 {{ dashboard?.errorRate ?? 0 }}%
               </span>
             </template>
           </n-statistic>
           <n-statistic v-else-if="dashboardState.isError.value" label="错误率">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="错误率" :value="0" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#18a058"><InformationCircleOutline /></n-icon>
+            <n-icon size="24" color="var(--color-success)"><InformationCircleOutline /></n-icon>
           </template>
           <n-statistic
             v-if="dashboardState.status.value === 'success'"
@@ -184,16 +184,16 @@ onMounted(() => {
           />
           <n-statistic v-else-if="dashboardState.isError.value" label="当前版本">
             <template #default>
-              <span style="color: #d03050">加载失败</span>
+              <span class="text-error">加载失败</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="当前版本" value="-" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#f0a020"><DocumentOutline /></n-icon>
+            <n-icon size="24" color="var(--color-warning)"><DocumentOutline /></n-icon>
           </template>
           <n-statistic
             v-if="dashboardState.status.value === 'success'"
@@ -202,7 +202,7 @@ onMounted(() => {
           />
           <n-statistic v-else-if="dashboardState.isError.value" label="系统状态">
             <template #default>
-              <span style="color: #d03050">异常</span>
+              <span class="text-error">异常</span>
             </template>
           </n-statistic>
           <n-statistic v-else label="系统状态" value="加载中..." />
@@ -244,7 +244,7 @@ onMounted(() => {
     v-model:show="showModal"
     preset="dialog"
     :title="editingLog ? '编辑日志' : '新增日志'"
-    style="width: 500px"
+    class="audit-modal"
   >
     <n-form :model="formValue" label-width="80">
       <n-form-item label="操作人" required>
@@ -260,3 +260,24 @@ onMounted(() => {
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.text-error {
+  color: var(--color-error);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.audit-modal {
+  width: 90%;
+  max-width: 500px;
+}
+
+@media (max-width: 767px) {
+  .audit-modal {
+    width: 95%;
+  }
+}
+</style>

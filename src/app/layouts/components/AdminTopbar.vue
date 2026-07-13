@@ -20,10 +20,12 @@ const props = defineProps<{
   layoutMode: 'side' | 'top' | 'mix'
   menuOptions?: MenuOption[]
   selectedTopKey?: string
+  isMobile?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:selectedTop-key': [key: string]
+  'toggle-mobile-sidebar': []
 }>()
 
 const router = useRouter()
@@ -43,10 +45,17 @@ function toggleFullscreen() {
   }
 }
 
+function handleToggleSidebar() {
+  if (props.isMobile) {
+    emit('toggle-mobile-sidebar')
+  } else {
+    toggleSidebar()
+  }
+}
+
 function handleTopMenuClick(key: string) {
   if (props.layoutMode === 'mix') {
     emit('update:selectedTop-key', key)
-    // 找到对应的菜单项，导航到第一个子菜单
     const option = props.menuOptions?.find((item) => item.key === key)
     if (option?.children?.length) {
       const firstChild = option.children[0]
@@ -55,25 +64,30 @@ function handleTopMenuClick(key: string) {
       }
     }
   } else if (props.layoutMode === 'top') {
-    // top 模式直接导航
     router.push({ name: key })
   }
 }
 </script>
 
 <template>
-  <div style="display: flex; align-items: center; justify-content: space-between; height: 56px">
-    <div style="display: flex; align-items: center; gap: 8px">
-      <n-button quaternary circle @click="toggleSidebar">
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <n-button
+        quaternary
+        circle
+        aria-label="切换侧边栏"
+        :aria-expanded="!setting.sidebarCollapsed"
+        @click="handleToggleSidebar"
+      >
         <template #icon>
           <n-icon :size="20">
             <MenuOutline />
           </n-icon>
         </template>
       </n-button>
-      <AdminBreadcrumb v-if="layoutMode === 'side' && setting.showBreadcrumb" />
+      <AdminBreadcrumb v-if="layoutMode === 'side' && setting.showBreadcrumb && !isMobile" />
       <n-menu
-        v-if="(layoutMode === 'top' || layoutMode === 'mix') && menuOptions"
+        v-if="(layoutMode === 'top' || layoutMode === 'mix') && menuOptions && !isMobile"
         mode="horizontal"
         :options="menuOptions"
         :value="layoutMode === 'mix' ? selectedTopKey : ($route.name as string)"
@@ -81,8 +95,14 @@ function handleTopMenuClick(key: string) {
       />
     </div>
 
-    <n-space align="center" :size="8">
-      <n-button quaternary circle @click="toggleDark">
+    <n-space align="center" :size="isMobile ? 'small' : 'medium'">
+      <n-button
+        quaternary
+        circle
+        :aria-label="isDark ? '切换到浅色模式' : '切换到深色模式'"
+        :aria-pressed="isDark"
+        @click="toggleDark"
+      >
         <template #icon>
           <n-icon :size="18">
             <MoonOutline v-if="!isDark" />
@@ -91,7 +111,14 @@ function handleTopMenuClick(key: string) {
         </template>
       </n-button>
 
-      <n-button quaternary circle @click="toggleFullscreen">
+      <n-button
+        v-if="!isMobile"
+        quaternary
+        circle
+        :aria-label="isFullscreen ? '退出全屏' : '进入全屏'"
+        :aria-pressed="isFullscreen"
+        @click="toggleFullscreen"
+      >
         <template #icon>
           <n-icon :size="18">
             <ContractOutline v-if="isFullscreen" />
@@ -100,7 +127,7 @@ function handleTopMenuClick(key: string) {
         </template>
       </n-button>
 
-      <n-button quaternary circle @click="showSettingPanel = true">
+      <n-button quaternary circle aria-label="打开设置" @click="showSettingPanel = true">
         <template #icon>
           <n-icon :size="18">
             <SettingsOutline />
@@ -110,7 +137,30 @@ function handleTopMenuClick(key: string) {
 
       <AdminUserMenu />
     </n-space>
-  </div>
+  </header>
 
   <AdminSettingPanel v-model:show="showSettingPanel" />
 </template>
+
+<style scoped>
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--topbar-height);
+  padding: 0 var(--space-4);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    height: 48px;
+    padding: 0 var(--space-3);
+  }
+}
+</style>

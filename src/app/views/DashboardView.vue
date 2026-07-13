@@ -37,11 +37,11 @@ const recentActivities = [
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#2080f0"><PeopleOutline /></n-icon>
+            <n-icon size="24" color="var(--color-primary)"><PeopleOutline /></n-icon>
           </template>
           <n-statistic label="用户总数" :value="1024">
             <template #suffix>
-              <n-tag type="success" size="small" style="margin-left: 8px">+12%</n-tag>
+              <n-tag type="success" size="small" style="margin-left: var(--space-2)">+12%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -49,11 +49,11 @@ const recentActivities = [
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#18a058"><EyeOutline /></n-icon>
+            <n-icon size="24" color="var(--color-success)"><EyeOutline /></n-icon>
           </template>
           <n-statistic label="今日访问" :value="56789">
             <template #suffix>
-              <n-tag type="info" size="small" style="margin-left: 8px">+8%</n-tag>
+              <n-tag type="info" size="small" style="margin-left: var(--space-2)">+8%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -61,11 +61,11 @@ const recentActivities = [
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#f0a020"><CartOutline /></n-icon>
+            <n-icon size="24" color="var(--color-warning)"><CartOutline /></n-icon>
           </template>
           <n-statistic label="订单数量" :value="256">
             <template #suffix>
-              <n-tag type="warning" size="small" style="margin-left: 8px">+5%</n-tag>
+              <n-tag type="warning" size="small" style="margin-left: var(--space-2)">+5%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -73,14 +73,14 @@ const recentActivities = [
       <n-gi>
         <n-card>
           <template #header-extra>
-            <n-icon size="24" color="#d03050"><CashOutline /></n-icon>
+            <n-icon size="24" color="var(--color-error)"><CashOutline /></n-icon>
           </template>
           <n-statistic label="总收入">
             <template #default>
-              <span style="color: #d03050">¥123,456</span>
+              <span style="color: var(--color-error)">¥123,456</span>
             </template>
             <template #suffix>
-              <n-tag type="error" size="small" style="margin-left: 8px">+15%</n-tag>
+              <n-tag type="error" size="small" style="margin-left: var(--space-2)">+15%</n-tag>
             </template>
           </n-statistic>
         </n-card>
@@ -92,7 +92,7 @@ const recentActivities = [
       <n-gi>
         <n-card title="欢迎使用">
           <template #header-extra>
-            <n-icon size="20" color="#2080f0"><InformationCircleOutline /></n-icon>
+            <n-icon size="20" color="var(--color-primary)"><InformationCircleOutline /></n-icon>
           </template>
           <n-space vertical :size="12">
             <p>
@@ -123,7 +123,7 @@ const recentActivities = [
       <n-gi>
         <n-card title="最近活动">
           <template #header-extra>
-            <n-icon size="20" color="#18a058"><TimeOutline /></n-icon>
+            <n-icon size="20" color="var(--color-success)"><TimeOutline /></n-icon>
           </template>
           <n-list bordered>
             <n-list-item v-for="activity in recentActivities" :key="activity.id">
@@ -133,10 +133,10 @@ const recentActivities = [
                     size="20"
                     :color="
                       activity.type === 'success'
-                        ? '#18a058'
+                        ? 'var(--color-success)'
                         : activity.type === 'warning'
-                          ? '#f0a020'
-                          : '#2080f0'
+                          ? 'var(--color-warning)'
+                          : 'var(--color-primary)'
                     "
                   >
                     <CheckmarkCircleOutline v-if="activity.type === 'success'" />
@@ -145,11 +145,11 @@ const recentActivities = [
                   </n-icon>
                 </template>
                 <template #header>
-                  <span style="font-weight: 500">{{ activity.user }}</span>
+                  <span style="font-weight: var(--font-medium)">{{ activity.user }}</span>
                 </template>
                 <template #description>
                   <span>{{ activity.action }}</span>
-                  <n-tag :type="activity.type" size="small" style="margin-left: 8px">{{
+                  <n-tag :type="activity.type" size="small" style="margin-left: var(--space-2)">{{
                     activity.time
                   }}</n-tag>
                 </template>

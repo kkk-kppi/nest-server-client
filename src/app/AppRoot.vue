@@ -26,23 +26,7 @@ const { theme, isDark } = useTheme()
         <NMessageProvider>
           <NLoadingBarProvider>
             <ErrorBoundary>
-              <div
-                v-if="authStore.authNotice"
-                style="
-                  position: fixed;
-                  z-index: 20;
-                  top: 12px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  background: #fee;
-                  color: #900;
-                  padding: 8px 12px;
-                  border: 1px solid #f99;
-                  border-radius: 6px;
-                  display: flex;
-                  gap: 8px;
-                "
-              >
+              <div v-if="authStore.authNotice" class="auth-notice">
                 <span>{{ authStore.authNotice }}</span>
                 <button type="button" @click="authStore.clearAuthNotice()">关闭</button>
               </div>
@@ -54,3 +38,20 @@ const { theme, isDark } = useTheme()
     </NDialogProvider>
   </NConfigProvider>
 </template>
+
+<style scoped>
+.auth-notice {
+  position: fixed;
+  z-index: var(--z-tooltip);
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-error-light);
+  color: var(--color-error);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-lg);
+  display: flex;
+  gap: var(--space-2);
+}
+</style>

@@ -29,7 +29,7 @@ const themeModes: { key: ThemeMode; label: string; icon: Component }[] = [
   <n-drawer :show="show" :width="320" @update:show="emit('update:show', $event)">
     <n-drawer-content title="布局设置">
       <n-text strong>布局模式</n-text>
-      <n-space style="margin: 12px 0">
+      <n-space class="setting-section">
         <n-button
           v-for="m in layoutModes"
           :key="m.key"
@@ -44,7 +44,7 @@ const themeModes: { key: ThemeMode; label: string; icon: Component }[] = [
       <n-divider />
 
       <n-text strong>主题模式</n-text>
-      <n-space style="margin: 12px 0">
+      <n-space class="setting-section">
         <n-button
           v-for="t in themeModes"
           :key="t.key"
@@ -62,19 +62,19 @@ const themeModes: { key: ThemeMode; label: string; icon: Component }[] = [
       <n-divider />
 
       <n-text strong>界面功能</n-text>
-      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px">
-        <div style="display: flex; justify-content: space-between; align-items: center">
+      <div class="setting-options">
+        <div class="setting-item">
           <n-text>多标签页</n-text>
           <n-switch :value="setting.showTabs" @update:value="updateSetting({ showTabs: $event })" />
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center">
+        <div class="setting-item">
           <n-text>面包屑</n-text>
           <n-switch
             :value="setting.showBreadcrumb"
             @update:value="updateSetting({ showBreadcrumb: $event })"
           />
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center">
+        <div class="setting-item">
           <n-text>固定顶栏</n-text>
           <n-switch
             :value="setting.fixedHeader"
@@ -85,3 +85,22 @@ const themeModes: { key: ThemeMode; label: string; icon: Component }[] = [
     </n-drawer-content>
   </n-drawer>
 </template>
+
+<style scoped>
+.setting-section {
+  margin: var(--space-3) 0;
+}
+
+.setting-options {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>

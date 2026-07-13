@@ -228,47 +228,66 @@
 
 /* ==================== 深色模式 ==================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* 背景色 */
-    --bg-primary: #16171d;
-    --bg-secondary: #1f2028;
-    --bg-tertiary: #2e303a;
-    --bg-overlay: rgba(0, 0, 0, 0.7);
+.dark {
+  /* 背景色 */
+  --bg-primary: #16171d;
+  --bg-secondary: #1f2028;
+  --bg-tertiary: #2e303a;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
 
-    /* 文本色 */
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-tertiary: #6b7280;
-    --text-disabled: #4b5563;
-    --text-inverse: #08060d;
+  /* 文本色 */
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+  --text-disabled: #4b5563;
+  --text-inverse: #08060d;
 
-    /* 边框色 */
-    --border-light: #2e303a;
-    --border-base: #3f3f46;
-    --border-dark: #52525b;
-    --border-focus: var(--color-primary);
+  /* 边框色 */
+  --border-light: #2e303a;
+  --border-base: #3f3f46;
+  --border-dark: #52525b;
+  --border-focus: var(--color-primary);
 
-    /* 主色调整 */
-    --color-primary: #4098fc;
-    --color-primary-hover: #60b0ff;
-    --color-primary-active: #2080f0;
-    --color-primary-light: rgba(64, 152, 252, 0.15);
-    --color-primary-lighter: rgba(64, 152, 252, 0.08);
+  /* 主色调整 */
+  --color-primary: #4098fc;
+  --color-primary-hover: #60b0ff;
+  --color-primary-active: #2080f0;
+  --color-primary-light: rgba(64, 152, 252, 0.15);
+  --color-primary-lighter: rgba(64, 152, 252, 0.08);
 
-    /* 阴影调整 */
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  /* 辅助色深色调整 */
+  --color-success: #63e2b7;
+  --color-success-hover: #7fe7c4;
+  --color-success-active: #5acea7;
+  --color-success-light: rgba(99, 226, 183, 0.15);
 
-    /* 表格 */
-    --table-header-bg: var(--bg-tertiary);
-    --table-row-hover: var(--bg-tertiary);
-  }
+  --color-warning: #fcb040;
+  --color-warning-hover: #fcd070;
+  --color-warning-active: #f0a020;
+  --color-warning-light: rgba(252, 176, 64, 0.15);
+
+  --color-error: #de576d;
+  --color-error-hover: #e8808f;
+  --color-error-active: #d03050;
+  --color-error-light: rgba(222, 87, 109, 0.15);
+
+  --color-info: #4098fc;
+  --color-info-hover: #60b0ff;
+  --color-info-active: #2080f0;
+  --color-info-light: rgba(64, 152, 252, 0.15);
+
+  /* 阴影调整 */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
+  /* 表格 */
+  --table-header-bg: var(--bg-tertiary);
+  --table-row-hover: var(--bg-tertiary);
 }
 
 /* ==================== 减少动画偏好 ==================== */

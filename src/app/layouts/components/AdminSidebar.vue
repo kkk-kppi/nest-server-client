@@ -17,17 +17,8 @@ function handleMenuUpdate(key: string) {
 </script>
 
 <template>
-  <div style="display: flex; flex-direction: column; height: 100%">
-    <div
-      style="
-        padding: 16px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 18px;
-        white-space: nowrap;
-        overflow: hidden;
-      "
-    >
+  <nav class="sidebar" role="navigation" aria-label="主导航">
+    <div class="sidebar-header">
       <span v-if="!collapsed">Admin System</span>
       <span v-else>AS</span>
     </div>
@@ -39,5 +30,22 @@ function handleMenuUpdate(key: string) {
       :value="route.name as string"
       @update:value="handleMenuUpdate"
     />
-  </div>
+  </nav>
 </template>
+
+<style scoped>
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-header {
+  padding: var(--space-4);
+  text-align: center;
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  white-space: nowrap;
+  overflow: hidden;
+}
+</style>

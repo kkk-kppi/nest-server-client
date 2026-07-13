@@ -7,6 +7,7 @@ import { setAccessTokenGetter, setUnauthorizedHandler } from '@/core/http'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import { clearDynamicRoutes } from '@/core/router/dynamic'
 import { initObservability, captureException, setUser } from '@/core/observability'
+import '../styles/tokens.css'
 import '../style.css'
 
 export async function bootstrap() {

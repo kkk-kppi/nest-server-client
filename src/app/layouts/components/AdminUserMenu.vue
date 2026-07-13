@@ -28,10 +28,17 @@ function handleSelect(key: string) {
 </script>
 
 <template>
-  <n-dropdown :options="options" @select="handleSelect">
-    <n-space align="center" style="cursor: pointer; padding: 0 8px">
-      <n-avatar :size="32" round>U</n-avatar>
+  <n-dropdown :options="options" aria-haspopup="menu" @select="handleSelect">
+    <n-space align="center" class="user-menu-trigger">
+      <n-avatar :size="32" round aria-hidden="true">U</n-avatar>
       <n-text>{{ authStore.roles[0] || 'User' }}</n-text>
     </n-space>
   </n-dropdown>
 </template>
+
+<style scoped>
+.user-menu-trigger {
+  cursor: pointer;
+  padding: 0 var(--space-2);
+}
+</style>
