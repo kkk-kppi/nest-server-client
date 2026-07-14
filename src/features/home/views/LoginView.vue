@@ -10,6 +10,7 @@ import type { UserRole } from '@/features/auth/store/useAuthStore'
 const router = useRouter()
 const authStore = useAuthStore()
 const loading = ref(false)
+const loginError = ref('')
 const formValue = ref({ role: 'admin' as UserRole })
 
 const roleOptions = [
@@ -20,12 +21,13 @@ const roleOptions = [
 
 async function handleLogin() {
   loading.value = true
+  loginError.value = ''
   try {
     const result = await loginByRole({ role: formValue.value.role })
     authStore.setSession(result)
     router.push('/dashboard')
   } catch (e) {
-    console.error(e)
+    loginError.value = e instanceof Error ? e.message : '登录失败'
   } finally {
     loading.value = false
   }
@@ -48,11 +50,12 @@ async function handleLogin() {
     <!-- 右侧登录表单 -->
     <div class="login-form-area">
       <n-card title="登录" class="login-card">
-        <n-form :model="formValue">
+        <n-form :model="formValue" @submit.prevent="handleLogin">
           <n-form-item label="角色">
             <n-select v-model:value="formValue.role" :options="roleOptions" />
           </n-form-item>
         </n-form>
+        <p v-if="loginError" class="login-error">{{ loginError }}</p>
         <template #footer>
           <n-button type="primary" block :loading="loading" @click="handleLogin"> 登录 </n-button>
         </template>
@@ -72,7 +75,7 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2080f0 0%, #4098fc 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   color: white;
 }
 
@@ -97,12 +100,18 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f7fa;
+  background: var(--bg-secondary);
 }
 
 .login-card {
   width: 400px;
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
+}
+
+.login-error {
+  color: var(--color-error);
+  text-align: center;
+  margin-top: 12px;
 }
 
 @media (max-width: 768px) {
