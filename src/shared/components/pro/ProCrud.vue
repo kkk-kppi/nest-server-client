@@ -34,19 +34,12 @@ interface ProCrudPermission {
   batchDelete?: string | string[]
 }
 
-interface CrudFunctions {
-  createFn: (data: Record<string, unknown>) => Promise<void>
-  updateFn: (id: string, data: Record<string, unknown>) => Promise<void>
-  deleteFn: (id: string) => Promise<void>
-  batchDeleteFn?: (ids: string[]) => Promise<void>
-}
-
 interface CrudTexts {
   add?: string
   edit?: string
   delete?: string
   batchDelete?: string
-  deleteConfirm?: string
+  confirmDelete?: string
   createSuccess?: string
   updateSuccess?: string
   deleteSuccess?: string
@@ -69,7 +62,10 @@ interface Props {
   formCols?: number
   permission?: ProCrudPermission
   deleteConfirmType?: 'modal' | 'popconfirm'
-  crudFunctions: CrudFunctions
+  createFn?: (data: Record<string, unknown>) => Promise<void>
+  updateFn?: (id: string, data: Record<string, unknown>) => Promise<void>
+  deleteFn?: (id: string) => Promise<void>
+  batchDeleteFn?: (ids: string[]) => Promise<void>
   texts?: CrudTexts
 }
 
@@ -86,6 +82,10 @@ const props = withDefaults(defineProps<Props>(), {
   formCols: 1,
   permission: () => ({}),
   deleteConfirmType: 'popconfirm',
+  createFn: undefined,
+  updateFn: undefined,
+  deleteFn: undefined,
+  batchDeleteFn: undefined,
   texts: () => ({}),
 })
 
@@ -125,7 +125,7 @@ const defaultTexts = computed(() => ({
   edit: t('common.edit'),
   delete: t('common.delete'),
   batchDelete: t('common.batchDelete'),
-  deleteConfirm: t('common.deleteConfirm'),
+  confirmDelete: t('common.confirmDelete'),
   createSuccess: t('common.createSuccess'),
   updateSuccess: t('common.updateSuccess'),
   deleteSuccess: t('common.deleteSuccess'),
@@ -138,7 +138,12 @@ const mergedTexts = computed(() => ({
 }))
 
 const createMutation = useMutation({
-  mutationFn: (data: Record<string, unknown>) => props.crudFunctions.createFn(data),
+  mutationFn: (data: Record<string, unknown>) => {
+    if (!props.createFn) {
+      throw new Error('createFn is not provided')
+    }
+    return props.createFn(data)
+  },
   onSuccess: () => {
     showModal.value = false
     proTableRef.value?.refresh()
@@ -147,8 +152,12 @@ const createMutation = useMutation({
 })
 
 const updateMutation = useMutation({
-  mutationFn: (data: Record<string, unknown>) =>
-    props.crudFunctions.updateFn(editingRow.value![props.rowKey] as string, data),
+  mutationFn: (data: Record<string, unknown>) => {
+    if (!props.updateFn) {
+      throw new Error('updateFn is not provided')
+    }
+    return props.updateFn(editingRow.value![props.rowKey] as string, data)
+  },
   onSuccess: () => {
     showModal.value = false
     proTableRef.value?.refresh()
@@ -157,7 +166,12 @@ const updateMutation = useMutation({
 })
 
 const deleteMutation = useMutation({
-  mutationFn: (id: string) => props.crudFunctions.deleteFn(id),
+  mutationFn: (id: string) => {
+    if (!props.deleteFn) {
+      throw new Error('deleteFn is not provided')
+    }
+    return props.deleteFn(id)
+  },
   onSuccess: () => {
     proTableRef.value?.refresh()
     emit('delete-success')
@@ -166,10 +180,10 @@ const deleteMutation = useMutation({
 
 const batchDeleteMutation = useMutation({
   mutationFn: (ids: string[]) => {
-    if (!props.crudFunctions.batchDeleteFn) {
+    if (!props.batchDeleteFn) {
       throw new Error('batchDeleteFn is not provided')
     }
-    return props.crudFunctions.batchDeleteFn(ids)
+    return props.batchDeleteFn(ids)
   },
   onSuccess: () => {
     selectedRowKeys.value = []
@@ -221,7 +235,7 @@ const mergedColumns = computed<DataTableColumns<Record<string, unknown>>>(() => 
                     { size: 'small', quaternary: true, type: 'error' },
                     () => mergedTexts.value.delete,
                   ),
-                default: () => mergedTexts.value.deleteConfirm,
+                default: () => mergedTexts.value.confirmDelete,
               },
             ),
           )
@@ -348,7 +362,7 @@ defineExpose({
           {{ mergedTexts.add }}
         </n-button>
         <n-button
-          v-if="canBatchDelete && props.crudFunctions.batchDeleteFn"
+          v-if="canBatchDelete && props.batchDeleteFn"
           :disabled="!selectedRowKeys.length"
           @click="handleBatchDelete"
         >
@@ -379,7 +393,7 @@ defineExpose({
         :show="showDeleteModal"
         preset="dialog"
         :title="mergedTexts.delete"
-        :content="mergedTexts.deleteConfirm"
+        :content="mergedTexts.confirmDelete"
         positive-text=""
         @update:show="(val: boolean) => (showDeleteModal = val)"
       >
