@@ -18,7 +18,13 @@ export const lightThemeOverrides: GlobalThemeOverrides = {
     infoColor: '#2080f0',
     infoColorHover: '#4098fc',
     infoColorPressed: '#1060c9',
-    borderRadius: '6px',
+    borderRadius: '8px',
+  },
+  Card: {
+    borderRadius: '12px',
+  },
+  Button: {
+    borderRadius: '8px',
   },
 }
 
@@ -40,7 +46,13 @@ export const darkThemeOverrides: GlobalThemeOverrides = {
     infoColor: '#4098fc',
     infoColorHover: '#60b0ff',
     infoColorPressed: '#2080f0',
-    borderRadius: '6px',
+    borderRadius: '8px',
+  },
+  Card: {
+    borderRadius: '12px',
+  },
+  Button: {
+    borderRadius: '8px',
   },
 }
 
