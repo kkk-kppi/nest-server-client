@@ -171,7 +171,14 @@ interface FieldGroup {
 
 const fieldGroups = computed<FieldGroup[]>(() => {
   if (!props.sections.length) {
-    return [{ key: '__default__', fields: props.fields }]
+    return [
+      {
+        key: '__default__',
+        fields: props.fields.filter((f) =>
+          typeof f.visible === 'function' ? f.visible(props.model) : f.visible !== false,
+        ),
+      },
+    ]
   }
 
   const groups = new Map<string, FormField[]>()
