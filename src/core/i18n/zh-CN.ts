@@ -24,6 +24,7 @@ export default {
     failed: '操作失败',
     confirmDelete: '确认删除？',
     deleteSuccess: '删除成功',
+    batchDelete: '批量删除',
     error: '加载失败',
     retry: '重试',
     fullscreen: '全屏',

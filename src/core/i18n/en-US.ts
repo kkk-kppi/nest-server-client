@@ -24,6 +24,7 @@ export default {
     failed: 'Failed',
     confirmDelete: 'Confirm delete?',
     deleteSuccess: 'Deleted successfully',
+    batchDelete: 'Batch Delete',
     error: 'Failed to load',
     retry: 'Retry',
     fullscreen: 'Fullscreen',
