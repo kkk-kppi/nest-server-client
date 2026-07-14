@@ -3,7 +3,7 @@
 
 :root {
   /* 使用 tokens.css 中定义的设计令牌 */
-  font: var(--text-lg)/var(--leading-relaxed) var(--ds-font-sans);
+  font: var(--text-lg)/var(--leading-relaxed) var(--font-sans);
   letter-spacing: var(--tracking-wide);
   color-scheme: light dark;
   color: var(--text-secondary);
@@ -28,7 +28,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--ds-font-heading);
+  font-family: var(--font-heading);
   font-weight: var(--font-medium);
   color: var(--text-primary);
 }
