@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import {
   NCard,
   NGrid,
@@ -26,8 +27,11 @@ import {
   DocumentTextOutline,
 } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/features/auth/store/useAuthStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const userName = computed(() => authStore.roles[0] || 'User')
 
 const quickLinks = [
   { title: '用户管理', icon: PeopleOutline, route: '/admin', color: 'var(--color-primary)' },
@@ -55,7 +59,7 @@ const recentActivities = [
     <n-card class="welcome-card">
       <div class="welcome-content">
         <div>
-          <h2 class="welcome-title">欢迎回来，Admin</h2>
+          <h2 class="welcome-title">欢迎回来，{{ userName }}</h2>
           <p class="welcome-date">
             今天是
             {{
@@ -133,7 +137,12 @@ const recentActivities = [
     <!-- 快捷入口 -->
     <n-grid :cols="4" :x-gap="16" responsive="screen" :item-responsive="true">
       <n-gi v-for="link in quickLinks" :key="link.title" span="4 m:2 l:1">
-        <n-card class="quick-link-card" @click="router.push(link.route)">
+        <n-card
+          class="quick-link-card"
+          tabindex="0"
+          @click="router.push(link.route)"
+          @keydown.enter="router.push(link.route)"
+        >
           <div class="quick-link-content">
             <n-icon :size="32" :color="link.color">
               <component :is="link.icon" />
