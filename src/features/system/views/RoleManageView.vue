@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
-import {
-  NButton,
-  NSpace,
-  NTag,
-  NPopconfirm,
-  NModal,
-  NForm,
-  NFormItem,
-  NInput,
-  NInputNumber,
-  NSelect,
-} from 'naive-ui'
+import { NButton, NSpace, NTag, NPopconfirm } from 'naive-ui'
 import ProTable from '@/shared/components/pro/ProTable.vue'
+import ProModalForm from '@/shared/components/pro/ProModalForm.vue'
 import {
   getSystemRoleList,
   createSystemRole,
@@ -30,6 +20,27 @@ const formValue = ref({
   sort: 0,
   status: '0',
 })
+
+const formFields = [
+  { key: 'name', label: '角色名称', required: true, group: 'basic' },
+  { key: 'code', label: '角色编码', required: true, group: 'basic' },
+  { key: 'sort', label: '排序', type: 'number' as const, group: 'config', props: { min: 0 } },
+  {
+    key: 'status',
+    label: '状态',
+    type: 'select' as const,
+    options: [
+      { label: '正常', value: '0' },
+      { label: '停用', value: '1' },
+    ],
+    group: 'config',
+  },
+]
+
+const formSections = [
+  { key: 'basic', title: '基本信息' },
+  { key: 'config', title: '配置' },
+]
 
 const columns: DataTableColumns = [
   { title: '角色名称', key: 'name', width: 120 },
@@ -127,44 +138,13 @@ async function handleSubmit() {
     </template>
   </ProTable>
 
-  <n-modal
+  <ProModalForm
     v-model:show="showModal"
-    preset="dialog"
     :title="editingRole ? '编辑角色' : '新增角色'"
-    class="role-modal"
-  >
-    <n-form :model="formValue" label-width="80">
-      <n-form-item label="角色名称"><n-input v-model:value="formValue.name" /></n-form-item>
-      <n-form-item label="角色编码"><n-input v-model:value="formValue.code" /></n-form-item>
-      <n-form-item label="排序"
-        ><n-input-number v-model:value="formValue.sort" :min="0"
-      /></n-form-item>
-      <n-form-item label="状态">
-        <n-select
-          v-model:value="formValue.status"
-          :options="[
-            { label: '正常', value: '0' },
-            { label: '停用', value: '1' },
-          ]"
-        />
-      </n-form-item>
-    </n-form>
-    <template #action>
-      <n-button @click="showModal = false">取消</n-button>
-      <n-button type="primary" @click="handleSubmit">确定</n-button>
-    </template>
-  </n-modal>
+    :fields="formFields"
+    :sections="formSections"
+    :model="formValue"
+    @update:model="(val) => (formValue = val as typeof formValue)"
+    @submit="handleSubmit"
+  />
 </template>
-
-<style scoped>
-.role-modal {
-  width: 90%;
-  max-width: 500px;
-}
-
-@media (max-width: 767px) {
-  .role-modal {
-    width: 95%;
-  }
-}
-</style>
