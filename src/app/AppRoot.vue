@@ -61,7 +61,7 @@ const { theme, isDark } = useTheme()
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-normal) ease;
 }
 
 .fade-enter-from,

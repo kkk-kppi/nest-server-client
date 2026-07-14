@@ -328,6 +328,11 @@ a {
 }
 
 /* 自定义滚动条 */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-base) transparent;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -348,7 +353,7 @@ a {
 
 /* 卡片 hover 效果 */
 .n-card {
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow var(--duration-normal) ease;
 }
 
 .n-card:hover {
