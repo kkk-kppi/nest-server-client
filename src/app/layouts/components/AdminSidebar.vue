@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-
+import { NIcon } from 'naive-ui'
+import { GridOutline } from '@vicons/ionicons5'
 import type { MenuOption } from 'naive-ui'
 
 defineProps<{
@@ -18,9 +19,11 @@ function handleMenuUpdate(key: string) {
 
 <template>
   <nav class="sidebar" role="navigation" aria-label="主导航">
-    <div class="sidebar-header">
-      <span v-if="!collapsed">Admin System</span>
-      <span v-else>AS</span>
+    <div class="sidebar-header" @click="router.push('/dashboard')">
+      <n-icon :size="28" color="var(--color-primary)">
+        <GridOutline />
+      </n-icon>
+      <span v-if="!collapsed" class="sidebar-title">Admin System</span>
     </div>
     <n-menu
       :collapsed="collapsed"
@@ -41,11 +44,22 @@ function handleMenuUpdate(key: string) {
 }
 
 .sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: var(--space-4);
-  text-align: center;
-  font-weight: var(--font-bold);
-  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+}
+
+.sidebar-header:hover {
+  opacity: 0.8;
+}
+
+.sidebar-title {
+  font-weight: 600;
+  font-size: 16px;
   white-space: nowrap;
-  overflow: hidden;
+  color: var(--text-primary);
 }
 </style>
