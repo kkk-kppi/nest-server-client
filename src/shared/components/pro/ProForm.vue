@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, type Component } from 'vue'
 import {
   NForm,
   NFormItem,
@@ -15,6 +15,14 @@ import {
   NSpace,
 } from 'naive-ui'
 import type { FormInst, FormRules, SelectOption } from 'naive-ui'
+
+interface FormSection {
+  key: string
+  title: string
+  description?: string
+  collapsible?: boolean
+  defaultCollapsed?: boolean
+}
 
 interface FormField {
   key: string
@@ -35,10 +43,16 @@ interface FormField {
   disabled?: boolean
   span?: number
   props?: Record<string, unknown>
+  icon?: Component
+  help?: string
+  description?: string
+  visible?: boolean | ((model: Record<string, unknown>) => boolean)
+  group?: string
 }
 
 interface Props {
   fields: FormField[]
+  sections?: FormSection[]
   model: Record<string, unknown>
   rules?: FormRules
   labelWidth?: number
@@ -53,6 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
   cols: 1,
   disabled: false,
   rules: () => ({}),
+  sections: () => [],
 })
 
 const emit = defineEmits<{
