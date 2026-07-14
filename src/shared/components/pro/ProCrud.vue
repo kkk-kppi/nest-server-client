@@ -314,6 +314,10 @@ function handlePopconfirmDelete(row: Record<string, unknown>) {
   deleteMutation.mutate(id)
 }
 
+function handleUpdateSelectedKeys(keys: string[]) {
+  selectedRowKeys.value = keys
+}
+
 function handleBatchDelete() {
   if (!selectedRowKeys.value.length) return
   batchDeleteMutation.mutate(selectedRowKeys.value)
@@ -354,6 +358,15 @@ defineExpose({
       :page-size="props.pageSize"
       :row-key="props.rowKey"
       :title="props.title"
+      :row-selection="
+        canBatchDelete && props.batchDeleteFn
+          ? {
+              type: 'checkbox',
+              selectedRowKeys: selectedRowKeys,
+              onUpdateSelectedKeys: handleUpdateSelectedKeys,
+            }
+          : undefined
+      "
       @search="handleSearch"
       @reset="handleReset"
     >

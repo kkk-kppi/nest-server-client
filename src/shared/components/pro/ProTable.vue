@@ -33,6 +33,12 @@ interface RequestResult<TRow> {
   total: number
 }
 
+interface RowSelection {
+  type: 'checkbox' | 'radio'
+  selectedRowKeys: string[]
+  onUpdateSelectedKeys: (keys: string[]) => void
+}
+
 interface Props<TRow = Record<string, unknown>> {
   columns: DataTableColumns<TRow>
   request: (params: RequestParams) => Promise<RequestResult<TRow>>
@@ -42,6 +48,7 @@ interface Props<TRow = Record<string, unknown>> {
   rowKey?: string
   toolbar?: boolean
   title?: string
+  rowSelection?: RowSelection
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -51,6 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
   rowKey: 'id',
   toolbar: true,
   title: '',
+  rowSelection: undefined,
 })
 
 const { t } = useI18n()
@@ -269,7 +277,12 @@ defineExpose({
       :pagination="props.pagination ? tablePagination : false"
       :row-key="getRowKeyValue"
       :bordered="false"
+      :row-selection="props.rowSelection ? { type: props.rowSelection.type } : undefined"
+      :checked-row-keys="props.rowSelection?.selectedRowKeys ?? []"
       striped
+      @update:checked-row-keys="
+        (keys: Array<string | number>) => props.rowSelection?.onUpdateSelectedKeys(keys as string[])
+      "
     />
 
     <slot name="extra" />
