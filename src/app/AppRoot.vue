@@ -30,7 +30,11 @@ const { theme, isDark } = useTheme()
                 <span>{{ authStore.authNotice }}</span>
                 <button type="button" @click="authStore.clearAuthNotice()">关闭</button>
               </div>
-              <RouterView />
+              <router-view v-slot="{ Component }">
+                <transition name="fade" mode="out-in">
+                  <component :is="Component" />
+                </transition>
+              </router-view>
             </ErrorBoundary>
           </NLoadingBarProvider>
         </NMessageProvider>
@@ -53,5 +57,15 @@ const { theme, isDark } = useTheme()
   border-radius: var(--radius-lg);
   display: flex;
   gap: var(--space-2);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

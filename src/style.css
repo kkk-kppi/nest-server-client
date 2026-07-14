@@ -326,3 +326,31 @@ a {
     outline-offset: 2px;
   }
 }
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-base);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-dark);
+}
+
+/* 卡片 hover 效果 */
+.n-card {
+  transition: box-shadow 0.2s ease;
+}
+
+.n-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
