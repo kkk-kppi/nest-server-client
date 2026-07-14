@@ -298,4 +298,20 @@ defineExpose({
   align-items: center;
   margin-bottom: var(--space-3);
 }
+
+@media (max-width: 767px) {
+  .search-bar :deep(.n-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+}
 </style>

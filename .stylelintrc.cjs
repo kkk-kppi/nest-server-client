@@ -18,5 +18,11 @@ module.exports = {
     'media-feature-range-notation': null,
     'at-rule-empty-line-before': null,
     'rule-empty-line-before': null,
+    'selector-pseudo-class-no-unknown': [
+      true,
+      {
+        ignorePseudoClasses: ['deep', 'slotted', 'global'],
+      },
+    ],
   },
 }

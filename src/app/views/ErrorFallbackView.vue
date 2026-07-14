@@ -48,22 +48,22 @@ const showErrorDetails = computed(() => isDev() && props.error)
 h1 {
   margin: 0;
   font-size: 2rem;
-  color: var(--text-h);
+  color: var(--text-primary);
 }
 
 p {
   margin: 1rem 0;
-  color: var(--text);
+  color: var(--text-secondary);
 }
 
 .event-id {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .event-id code {
   padding: 0.25rem 0.5rem;
-  background: var(--code-bg);
+  background: var(--bg-tertiary);
   border-radius: 4px;
   font-family: monospace;
 }
@@ -75,7 +75,7 @@ details {
 
 pre {
   padding: 1rem;
-  background: var(--code-bg);
+  background: var(--bg-tertiary);
   border-radius: 4px;
   overflow-x: auto;
   font-size: 0.875rem;
@@ -91,15 +91,15 @@ pre {
 
 button {
   padding: 0.5rem 1rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-light);
   border-radius: 4px;
   background: transparent;
-  color: var(--text-h);
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 0.875rem;
 }
 
 button:hover {
-  background: var(--accent-bg);
+  background: var(--color-primary-light);
 }
 </style>

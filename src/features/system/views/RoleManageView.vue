@@ -158,6 +158,13 @@ async function handleSubmit() {
 
 <style scoped>
 .role-modal {
-  width: 500px;
+  width: 90%;
+  max-width: 500px;
+}
+
+@media (max-width: 767px) {
+  .role-modal {
+    width: 95%;
+  }
 }
 </style>

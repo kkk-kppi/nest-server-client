@@ -244,4 +244,14 @@ defineExpose({
 .full-width {
   width: 100%;
 }
+
+@media (max-width: 767px) {
+  :deep(.n-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  :deep(.n-form-item-label) {
+    text-align: left;
+  }
+}
 </style>

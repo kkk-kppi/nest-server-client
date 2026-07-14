@@ -156,8 +156,8 @@ onMounted(() => {
 <template>
   <n-space vertical :size="16">
     <!-- 统计卡片 -->
-    <n-grid :cols="4" :x-gap="16" :y-gap="16">
-      <n-gi>
+    <n-grid :cols="4" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-success)"><FolderOpenOutline /></n-icon>
@@ -175,7 +175,7 @@ onMounted(() => {
           <n-statistic v-else label="项目名称" value="-" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-primary)"><PeopleOutline /></n-icon>
@@ -193,7 +193,7 @@ onMounted(() => {
           <n-statistic v-else label="负责人" value="-" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-warning)"><TimeOutline /></n-icon>
@@ -211,7 +211,7 @@ onMounted(() => {
           <n-statistic v-else label="任务总数" :value="0" />
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-success)"><CheckmarkCircleOutline /></n-icon>
@@ -286,6 +286,13 @@ onMounted(() => {
 
 <style scoped>
 .task-modal {
-  width: 500px;
+  width: 90%;
+  max-width: 500px;
+}
+
+@media (max-width: 767px) {
+  .task-modal {
+    width: 95%;
+  }
 }
 </style>

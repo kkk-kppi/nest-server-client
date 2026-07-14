@@ -33,8 +33,8 @@ const recentActivities = [
 <template>
   <n-space vertical :size="16">
     <!-- 统计卡片 -->
-    <n-grid :cols="4" :x-gap="16" :y-gap="16">
-      <n-gi>
+    <n-grid :cols="4" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-primary)"><PeopleOutline /></n-icon>
@@ -46,7 +46,7 @@ const recentActivities = [
           </n-statistic>
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-success)"><EyeOutline /></n-icon>
@@ -58,7 +58,7 @@ const recentActivities = [
           </n-statistic>
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-warning)"><CartOutline /></n-icon>
@@ -70,7 +70,7 @@ const recentActivities = [
           </n-statistic>
         </n-card>
       </n-gi>
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card>
           <template #header-extra>
             <n-icon size="24" color="var(--color-error)"><CashOutline /></n-icon>
@@ -87,9 +87,9 @@ const recentActivities = [
       </n-gi>
     </n-grid>
 
-    <n-grid :cols="2" :x-gap="16">
+    <n-grid :cols="2" :x-gap="16" responsive="screen" :item-responsive="true">
       <!-- 欢迎信息 -->
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card title="欢迎使用">
           <template #header-extra>
             <n-icon size="20" color="var(--color-primary)"><InformationCircleOutline /></n-icon>
@@ -120,7 +120,7 @@ const recentActivities = [
       </n-gi>
 
       <!-- 最近活动 -->
-      <n-gi>
+      <n-gi span="4 m:2 l:1">
         <n-card title="最近活动">
           <template #header-extra>
             <n-icon size="20" color="var(--color-success)"><TimeOutline /></n-icon>

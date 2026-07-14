@@ -250,6 +250,13 @@ async function handleSubmit() {
 
 <style scoped>
 .user-modal {
-  width: 500px;
+  width: 90%;
+  max-width: 500px;
+}
+
+@media (max-width: 767px) {
+  .user-modal {
+    width: 95%;
+  }
 }
 </style>

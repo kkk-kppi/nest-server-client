@@ -240,8 +240,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div style="display: flex; gap: 16px">
-    <n-card title="字典类型" :bordered="false" style="flex: 1">
+  <div class="dict-layout">
+    <n-card title="字典类型" :bordered="false" class="dict-data-card">
       <template #header-extra>
         <n-button type="primary" size="small" @click="handleAddType">新增</n-button>
       </template>
@@ -347,6 +347,22 @@ onMounted(() => {
 }
 
 .dict-modal {
-  width: 500px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.dict-layout {
+  display: flex;
+  gap: var(--space-4);
+}
+
+@media (max-width: 767px) {
+  .dict-modal {
+    width: 95%;
+  }
+
+  .dict-layout {
+    flex-direction: column;
+  }
 }
 </style>
