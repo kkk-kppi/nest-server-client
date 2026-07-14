@@ -1,3 +1,39 @@
+<script lang="ts">
+export interface FormSection {
+  key: string
+  title: string
+  description?: string
+  collapsible?: boolean
+  defaultCollapsed?: boolean
+}
+
+export interface FormField {
+  key: string
+  label: string
+  type?:
+    | 'input'
+    | 'number'
+    | 'select'
+    | 'switch'
+    | 'radio'
+    | 'checkbox'
+    | 'date'
+    | 'time'
+    | 'textarea'
+  placeholder?: string
+  options?: SelectOption[]
+  required?: boolean
+  disabled?: boolean
+  span?: number
+  props?: Record<string, unknown>
+  icon?: Component
+  help?: string
+  description?: string
+  visible?: boolean | ((model: Record<string, unknown>) => boolean)
+  group?: string
+}
+</script>
+
 <script setup lang="ts">
 import { ref, computed, watch, type Component } from 'vue'
 import {
@@ -24,40 +60,6 @@ import {
   InformationCircleOutline,
 } from '@vicons/ionicons5'
 import type { FormInst, FormRules, SelectOption } from 'naive-ui'
-
-interface FormSection {
-  key: string
-  title: string
-  description?: string
-  collapsible?: boolean
-  defaultCollapsed?: boolean
-}
-
-interface FormField {
-  key: string
-  label: string
-  type?:
-    | 'input'
-    | 'number'
-    | 'select'
-    | 'switch'
-    | 'radio'
-    | 'checkbox'
-    | 'date'
-    | 'time'
-    | 'textarea'
-  placeholder?: string
-  options?: SelectOption[]
-  required?: boolean
-  disabled?: boolean
-  span?: number
-  props?: Record<string, unknown>
-  icon?: Component
-  help?: string
-  description?: string
-  visible?: boolean | ((model: Record<string, unknown>) => boolean)
-  group?: string
-}
 
 interface Props {
   fields: FormField[]
