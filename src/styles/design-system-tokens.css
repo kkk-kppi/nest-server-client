@@ -1,0 +1,458 @@
+/**
+ * UI/UX Pro Max 设计系统令牌
+ * 基于 enterprise SaaS productivity dashboard 生成
+ * 项目: Nest Server Client
+ * 生成时间: 2026-07-14
+ */
+
+:root {
+  /* ==================== 设计系统颜色 ==================== */
+
+  /* 主色 - 青绿色 */
+  --ds-color-primary: #0d9488;
+  --ds-color-primary-hover: #0f766e;
+  --ds-color-primary-active: #0d9488;
+  --ds-color-primary-light: rgba(13, 148, 136, 0.1);
+  --ds-color-primary-lighter: rgba(13, 148, 136, 0.05);
+
+  /* 辅助色 */
+  --ds-color-secondary: #14b8a6;
+  --ds-color-secondary-hover: #0d9488;
+  --ds-color-secondary-active: #0f766e;
+  --ds-color-secondary-light: rgba(20, 184, 166, 0.1);
+
+  /* 强调色/CTA */
+  --ds-color-accent: #ea580c;
+  --ds-color-accent-hover: #dc2626;
+  --ds-color-accent-active: #c2410c;
+  --ds-color-accent-light: rgba(234, 88, 12, 0.1);
+
+  /* 背景色 */
+  --ds-color-background: #f0fdfa;
+  --ds-color-background-secondary: #f0fdfa;
+  --ds-color-background-tertiary: #e8f1f4;
+
+  /* 前景色/文本 */
+  --ds-color-foreground: #134e4a;
+  --ds-color-foreground-secondary: #134e4a;
+  --ds-color-foreground-muted: #6b7280;
+
+  /* 静音色 */
+  --ds-color-muted: #e8f1f4;
+  --ds-color-muted-foreground: #6b7280;
+
+  /* 边框色 */
+  --ds-color-border: #99f6e4;
+  --ds-color-border-light: #e2e8f0;
+  --ds-color-border-focus: #0d9488;
+
+  /* 破坏性/错误色 */
+  --ds-color-destructive: #dc2626;
+  --ds-color-destructive-hover: #b91c1c;
+  --ds-color-destructive-active: #991b1b;
+  --ds-color-destructive-light: rgba(220, 38, 38, 0.1);
+
+  /* 环形焦点色 */
+  --ds-color-ring: #0d9488;
+
+  /* ==================== 设计系统字体 ==================== */
+
+  /* 字体栈 */
+  --ds-font-sans:
+    'Plus Jakarta Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ds-font-heading:
+    'Plus Jakarta Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ds-font-mono: ui-monospace, Consolas, 'Courier New', monospace;
+
+  /* 字体大小 */
+  --ds-text-xs: 12px;
+  --ds-text-sm: 14px;
+  --ds-text-base: 16px;
+  --ds-text-lg: 18px;
+  --ds-text-xl: 20px;
+  --ds-text-2xl: 24px;
+  --ds-text-3xl: 30px;
+  --ds-text-4xl: 36px;
+  --ds-text-5xl: 48px;
+
+  /* ==================== 设计系统间距 ==================== */
+
+  /* 基础间距 */
+  --ds-space-xs: 4px;
+  --ds-space-sm: 8px;
+  --ds-space-md: 16px;
+  --ds-space-lg: 24px;
+  --ds-space-xl: 32px;
+  --ds-space-2xl: 48px;
+  --ds-space-3xl: 64px;
+
+  /* ==================== 设计系统阴影 ==================== */
+
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ds-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --ds-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --ds-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* ==================== 设计系统圆角 ==================== */
+
+  --ds-radius-sm: 4px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+  --ds-radius-xl: 16px;
+  --ds-radius-2xl: 24px;
+  --ds-radius-full: 9999px;
+
+  /* ==================== 设计系统动画 ==================== */
+
+  --ds-duration-fast: 150ms;
+  --ds-duration-normal: 200ms;
+  --ds-duration-slow: 300ms;
+  --ds-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ds-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ds-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==================== 深色模式 ==================== */
+
+.dark {
+  /* 主色调整 */
+  --ds-color-primary: #14b8a6;
+  --ds-color-primary-hover: #2dd4bf;
+  --ds-color-primary-active: #0d9488;
+  --ds-color-primary-light: rgba(20, 184, 166, 0.15);
+  --ds-color-primary-lighter: rgba(20, 184, 166, 0.08);
+
+  /* 辅助色调整 */
+  --ds-color-secondary: #2dd4bf;
+  --ds-color-secondary-hover: #5eead4;
+  --ds-color-secondary-active: #14b8a6;
+  --ds-color-secondary-light: rgba(45, 212, 191, 0.15);
+
+  /* 强调色调整 */
+  --ds-color-accent: #fb923c;
+  --ds-color-accent-hover: #fdba74;
+  --ds-color-accent-active: #f97316;
+  --ds-color-accent-light: rgba(251, 146, 60, 0.15);
+
+  /* 背景色调整 */
+  --ds-color-background: #0f172a;
+  --ds-color-background-secondary: #1e293b;
+  --ds-color-background-tertiary: #334155;
+
+  /* 前景色调整 */
+  --ds-color-foreground: #f1f5f9;
+  --ds-color-foreground-secondary: #cbd5e1;
+  --ds-color-foreground-muted: #94a3b8;
+
+  /* 静音色调整 */
+  --ds-color-muted: #1e293b;
+  --ds-color-muted-foreground: #94a3b8;
+
+  /* 边框色调整 */
+  --ds-color-border: #334155;
+  --ds-color-border-light: #1e293b;
+  --ds-color-border-focus: #14b8a6;
+
+  /* 破坏性/错误色调整 */
+  --ds-color-destructive: #ef4444;
+  --ds-color-destructive-hover: #f87171;
+  --ds-color-destructive-active: #dc2626;
+  --ds-color-destructive-light: rgba(239, 68, 68, 0.15);
+
+  /* 环形焦点色调整 */
+  --ds-color-ring: #14b8a6;
+
+  /* 阴影调整 */
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --ds-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --ds-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --ds-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* ==================== 减少动画偏好 ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ds-duration-fast: 0ms;
+    --ds-duration-normal: 0ms;
+    --ds-duration-slow: 0ms;
+  }
+}
+
+/* ==================== 设计系统工具类 ==================== */
+
+/* 颜色工具类 */
+.ds-bg-primary {
+  background-color: var(--ds-color-primary);
+}
+.ds-bg-secondary {
+  background-color: var(--ds-color-secondary);
+}
+.ds-bg-accent {
+  background-color: var(--ds-color-accent);
+}
+.ds-bg-destructive {
+  background-color: var(--ds-color-destructive);
+}
+.ds-bg-muted {
+  background-color: var(--ds-color-muted);
+}
+
+.ds-text-primary {
+  color: var(--ds-color-foreground);
+}
+.ds-text-secondary {
+  color: var(--ds-color-foreground-secondary);
+}
+.ds-text-muted {
+  color: var(--ds-color-foreground-muted);
+}
+.ds-text-accent {
+  color: var(--ds-color-accent);
+}
+.ds-text-destructive {
+  color: var(--ds-color-destructive);
+}
+
+.ds-border-primary {
+  border-color: var(--ds-color-primary);
+}
+.ds-border-secondary {
+  border-color: var(--ds-color-secondary);
+}
+.ds-border-accent {
+  border-color: var(--ds-color-accent);
+}
+.ds-border-destructive {
+  border-color: var(--ds-color-destructive);
+}
+.ds-border-muted {
+  border-color: var(--ds-color-muted);
+}
+
+/* 间距工具类 */
+.ds-p-xs {
+  padding: var(--ds-space-xs);
+}
+.ds-p-sm {
+  padding: var(--ds-space-sm);
+}
+.ds-p-md {
+  padding: var(--ds-space-md);
+}
+.ds-p-lg {
+  padding: var(--ds-space-lg);
+}
+.ds-p-xl {
+  padding: var(--ds-space-xl);
+}
+.ds-p-2xl {
+  padding: var(--ds-space-2xl);
+}
+.ds-p-3xl {
+  padding: var(--ds-space-3xl);
+}
+
+.ds-m-xs {
+  margin: var(--ds-space-xs);
+}
+.ds-m-sm {
+  margin: var(--ds-space-sm);
+}
+.ds-m-md {
+  margin: var(--ds-space-md);
+}
+.ds-m-lg {
+  margin: var(--ds-space-lg);
+}
+.ds-m-xl {
+  margin: var(--ds-space-xl);
+}
+.ds-m-2xl {
+  margin: var(--ds-space-2xl);
+}
+.ds-m-3xl {
+  margin: var(--ds-space-3xl);
+}
+
+/* 阴影工具类 */
+.ds-shadow-sm {
+  box-shadow: var(--ds-shadow-sm);
+}
+.ds-shadow-md {
+  box-shadow: var(--ds-shadow-md);
+}
+.ds-shadow-lg {
+  box-shadow: var(--ds-shadow-lg);
+}
+.ds-shadow-xl {
+  box-shadow: var(--ds-shadow-xl);
+}
+
+/* 圆角工具类 */
+.ds-rounded-sm {
+  border-radius: var(--ds-radius-sm);
+}
+.ds-rounded-md {
+  border-radius: var(--ds-radius-md);
+}
+.ds-rounded-lg {
+  border-radius: var(--ds-radius-lg);
+}
+.ds-rounded-xl {
+  border-radius: var(--ds-radius-xl);
+}
+.ds-rounded-2xl {
+  border-radius: var(--ds-radius-2xl);
+}
+.ds-rounded-full {
+  border-radius: var(--ds-radius-full);
+}
+
+/* 过渡工具类 */
+.ds-transition-fast {
+  transition: all var(--ds-duration-fast) var(--ds-ease-out);
+}
+.ds-transition-normal {
+  transition: all var(--ds-duration-normal) var(--ds-ease-out);
+}
+.ds-transition-slow {
+  transition: all var(--ds-duration-slow) var(--ds-ease-out);
+}
+
+/* ==================== 设计系统组件样式 ==================== */
+
+/* 按钮组件 */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: var(--ds-radius-md);
+  font-weight: 600;
+  font-size: var(--ds-text-base);
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--ds-duration-normal) var(--ds-ease-out);
+  border: none;
+  outline: none;
+}
+
+.ds-btn:focus-visible {
+  outline: 2px solid var(--ds-color-ring);
+  outline-offset: 2px;
+}
+
+.ds-btn-primary {
+  background-color: var(--ds-color-accent);
+  color: white;
+}
+
+.ds-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.ds-btn-secondary {
+  background-color: transparent;
+  color: var(--ds-color-primary);
+  border: 2px solid var(--ds-color-primary);
+}
+
+.ds-btn-secondary:hover {
+  background-color: var(--ds-color-primary);
+  color: white;
+}
+
+.ds-btn-destructive {
+  background-color: var(--ds-color-destructive);
+  color: white;
+}
+
+.ds-btn-destructive:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* 卡片组件 */
+.ds-card {
+  background-color: var(--ds-color-background);
+  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-space-lg);
+  box-shadow: var(--ds-shadow-md);
+  transition: all var(--ds-duration-normal) var(--ds-ease-out);
+  cursor: pointer;
+}
+
+.ds-card:hover {
+  box-shadow: var(--ds-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* 输入框组件 */
+.ds-input {
+  padding: 12px 16px;
+  border: 1px solid var(--ds-color-border-light);
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-text-base);
+  transition: border-color var(--ds-duration-normal) var(--ds-ease-out);
+  background-color: var(--ds-color-background);
+  color: var(--ds-color-foreground);
+}
+
+.ds-input:focus {
+  border-color: var(--ds-color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ds-color-primary-light);
+}
+
+.ds-input::placeholder {
+  color: var(--ds-color-foreground-muted);
+}
+
+/* 模态框组件 */
+.ds-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.ds-modal {
+  background-color: var(--ds-color-background);
+  border-radius: var(--ds-radius-xl);
+  padding: var(--ds-space-xl);
+  box-shadow: var(--ds-shadow-xl);
+  max-width: 500px;
+  width: 90%;
+}
+
+/* 标签组件 */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-full);
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ds-badge-primary {
+  background-color: var(--ds-color-primary-light);
+  color: var(--ds-color-primary);
+}
+
+.ds-badge-secondary {
+  background-color: var(--ds-color-secondary-light);
+  color: var(--ds-color-secondary);
+}
+
+.ds-badge-accent {
+  background-color: var(--ds-color-accent-light);
+  color: var(--ds-color-accent);
+}
+
+.ds-badge-destructive {
+  background-color: var(--ds-color-destructive-light);
+  color: var(--ds-color-destructive);
+}
