@@ -10,6 +10,7 @@ import {
   NList,
   NListItem,
   NThing,
+  NButton,
 } from 'naive-ui'
 import {
   PeopleOutline,
@@ -20,7 +21,25 @@ import {
   TimeOutline,
   CheckmarkCircleOutline,
   InformationCircleOutline,
+  FolderOpenOutline,
+  SettingsOutline,
+  DocumentTextOutline,
 } from '@vicons/ionicons5'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const quickLinks = [
+  { title: '用户管理', icon: PeopleOutline, route: '/admin', color: 'var(--color-primary)' },
+  {
+    title: '工作空间',
+    icon: FolderOpenOutline,
+    route: '/workspace',
+    color: 'var(--color-success)',
+  },
+  { title: '系统设置', icon: SettingsOutline, route: '/admin', color: 'var(--color-warning)' },
+  { title: '审计日志', icon: DocumentTextOutline, route: '/admin', color: 'var(--color-info)' },
+]
 
 const recentActivities = [
   { id: 1, user: 'admin', action: '创建了新用户', time: '2分钟前', type: 'success' as const },
@@ -32,6 +51,30 @@ const recentActivities = [
 
 <template>
   <n-space vertical :size="16">
+    <!-- 欢迎区域 -->
+    <n-card class="welcome-card">
+      <div class="welcome-content">
+        <div>
+          <h2 class="welcome-title">欢迎回来，Admin</h2>
+          <p class="welcome-date">
+            今天是
+            {{
+              new Date().toLocaleDateString('zh-CN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+            }}
+          </p>
+        </div>
+        <n-space>
+          <n-button type="primary" @click="router.push('/admin')">用户管理</n-button>
+          <n-button @click="router.push('/workspace')">工作空间</n-button>
+        </n-space>
+      </div>
+    </n-card>
+
     <!-- 统计卡片 -->
     <n-grid :cols="4" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
       <n-gi span="4 m:2 l:1">
@@ -87,10 +130,24 @@ const recentActivities = [
       </n-gi>
     </n-grid>
 
+    <!-- 快捷入口 -->
+    <n-grid :cols="4" :x-gap="16" responsive="screen" :item-responsive="true">
+      <n-gi v-for="link in quickLinks" :key="link.title" span="4 m:2 l:1">
+        <n-card class="quick-link-card" @click="router.push(link.route)">
+          <div class="quick-link-content">
+            <n-icon :size="32" :color="link.color">
+              <component :is="link.icon" />
+            </n-icon>
+            <span class="quick-link-title">{{ link.title }}</span>
+          </div>
+        </n-card>
+      </n-gi>
+    </n-grid>
+
     <n-grid :cols="2" :x-gap="16" responsive="screen" :item-responsive="true">
-      <!-- 欢迎信息 -->
+      <!-- 系统信息 -->
       <n-gi span="4 m:2 l:1">
-        <n-card title="欢迎使用">
+        <n-card title="系统信息">
           <template #header-extra>
             <n-icon size="20" color="var(--color-primary)"><InformationCircleOutline /></n-icon>
           </template>
@@ -100,7 +157,6 @@ const recentActivities = [
               <n-tag type="success" size="small">TypeScript</n-tag> +
               <n-tag type="warning" size="small">Naive UI</n-tag> 构建。
             </p>
-            <p>系统功能包括：</p>
             <n-list bordered>
               <n-list-item>
                 <n-thing title="用户管理" description="管理系统用户、角色和权限" />
@@ -159,3 +215,69 @@ const recentActivities = [
     </n-grid>
   </n-space>
 </template>
+
+<style scoped>
+.welcome-card {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+}
+
+.welcome-card :deep(.n-card__content) {
+  color: white;
+}
+
+.welcome-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: white;
+}
+
+.welcome-date {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.quick-link-card {
+  cursor: pointer;
+  transition:
+    box-shadow var(--duration-normal) ease,
+    transform var(--duration-normal) ease;
+}
+
+.quick-link-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.quick-link-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.quick-link-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+@media (max-width: 767px) {
+  .welcome-content {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+</style>
