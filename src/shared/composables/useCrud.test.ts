@@ -7,12 +7,6 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-vi.mock('@/features/auth', () => ({
-  usePermission: () => ({
-    hasPermission: () => true,
-  }),
-}))
-
 describe('useCrud', () => {
   const mockRequest = vi.fn().mockResolvedValue({ items: [], total: 0 })
   const mockCreateFn = vi.fn().mockResolvedValue(undefined)

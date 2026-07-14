@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useMutation } from './useMutation'
-import { usePermission } from '@/features/auth'
 import type { DataTableColumns } from 'naive-ui'
 import type { FormField, FormSection } from '@/shared/components/pro/ProForm.vue'
 
@@ -35,11 +34,10 @@ interface UseCrudOptions {
   formFields: FormField[]
   formSections?: FormSection[]
   permission?: ProCrudPermission
-  deleteConfirmType?: 'modal' | 'popconfirm'
-  batchDelete?: boolean
-  createFn?: (data: Record<string, unknown>) => Promise<void>
-  updateFn?: (id: string, data: Record<string, unknown>) => Promise<void>
-  deleteFn?: (id: string) => Promise<void>
+  checkPermission?: (code?: string | string[]) => boolean
+  createFn: (data: Record<string, unknown>) => Promise<void>
+  updateFn: (id: string, data: Record<string, unknown>) => Promise<void>
+  deleteFn: (id: string) => Promise<void>
   batchDeleteFn?: (ids: string[]) => Promise<void>
   onSuccess?: () => void
   rowKey?: string
@@ -54,6 +52,7 @@ export function useCrud(options: UseCrudOptions) {
     formFields,
     formSections = [],
     permission,
+    checkPermission: checkPermissionFn,
     createFn,
     updateFn,
     deleteFn,
@@ -62,19 +61,18 @@ export function useCrud(options: UseCrudOptions) {
     rowKey = 'id',
   } = options
 
+  const defaultCheckPermission = (code?: string | string[]): boolean => {
+    if (!code) return true
+    return true
+  }
+
+  const checkPermission = checkPermissionFn ?? defaultCheckPermission
+
   const showModal = ref(false)
   const editingRow = ref<Record<string, unknown> | null>(null)
   const formValue = ref<Record<string, unknown>>({})
   const selectedRowKeys = ref<string[]>([])
   const proTableRef = ref<{ refresh: () => void; reset: () => void } | null>(null)
-
-  const { hasPermission } = usePermission()
-
-  function checkPermission(code?: string | string[]): boolean {
-    if (!code) return true
-    const codes = Array.isArray(code) ? code : [code]
-    return hasPermission(codes)
-  }
 
   const canCreate = computed(() => checkPermission(permission?.create))
   const canUpdate = computed(() => checkPermission(permission?.update))
@@ -82,7 +80,7 @@ export function useCrud(options: UseCrudOptions) {
   const canBatchDelete = computed(() => checkPermission(permission?.batchDelete))
 
   const createMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => createFn!(data),
+    mutationFn: (data: Record<string, unknown>) => createFn(data),
     onSuccess: () => {
       showModal.value = false
       proTableRef.value?.refresh()
@@ -92,7 +90,7 @@ export function useCrud(options: UseCrudOptions) {
 
   const updateMutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      updateFn!(editingRow.value![rowKey] as string, data),
+      updateFn(editingRow.value![rowKey] as string, data),
     onSuccess: () => {
       showModal.value = false
       proTableRef.value?.refresh()
@@ -101,7 +99,7 @@ export function useCrud(options: UseCrudOptions) {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteFn!(id),
+    mutationFn: (id: string) => deleteFn(id),
     onSuccess: () => {
       proTableRef.value?.refresh()
       onSuccess?.()
@@ -109,7 +107,10 @@ export function useCrud(options: UseCrudOptions) {
   })
 
   const batchDeleteMutation = useMutation({
-    mutationFn: (ids: string[]) => batchDeleteFn!(ids),
+    mutationFn: (ids: string[]) => {
+      if (!batchDeleteFn) throw new Error('batchDeleteFn is not provided')
+      return batchDeleteFn(ids)
+    },
     onSuccess: () => {
       selectedRowKeys.value = []
       proTableRef.value?.refresh()
