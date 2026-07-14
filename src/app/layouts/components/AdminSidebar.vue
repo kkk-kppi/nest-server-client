@@ -19,7 +19,12 @@ function handleMenuUpdate(key: string) {
 
 <template>
   <nav class="sidebar" role="navigation" aria-label="主导航">
-    <div class="sidebar-header" @click="router.push('/dashboard')">
+    <div
+      class="sidebar-header"
+      role="link"
+      aria-label="返回仪表盘"
+      @click="router.push('/dashboard')"
+    >
       <n-icon :size="28" color="var(--color-primary)">
         <GridOutline />
       </n-icon>
@@ -54,6 +59,11 @@ function handleMenuUpdate(key: string) {
 
 .sidebar-header:hover {
   opacity: 0.8;
+}
+
+.sidebar-header:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .sidebar-title {
