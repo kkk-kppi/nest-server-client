@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NButton, NSpace, NTag, NPopconfirm, NModal } from 'naive-ui'
+import { NButton, NSpace, NTag, NPopconfirm } from 'naive-ui'
 import ProTable from '@/shared/components/pro/ProTable.vue'
-import ProForm from '@/shared/components/pro/ProForm.vue'
+import ProModalForm from '@/shared/components/pro/ProModalForm.vue'
 import { useMutation } from '@/shared/composables/useMutation'
 import { usePermission } from '@/features/auth/usePermission'
 import {
@@ -18,7 +18,6 @@ type UserRow = SystemUserData['items'][number]
 
 const { t } = useI18n()
 const proTableRef = ref()
-const proFormRef = ref()
 const showModal = ref(false)
 const editingUser = ref<UserRow | null>(null)
 const formValue = ref<{
@@ -141,10 +140,10 @@ const searchFields = [
 ]
 
 const formFields = [
-  { key: 'username', label: t('system.user.username'), required: true },
-  { key: 'nickname', label: t('system.user.nickname'), required: true },
-  { key: 'email', label: t('system.user.email') },
-  { key: 'phone', label: t('system.user.phone') },
+  { key: 'username', label: t('system.user.username'), required: true, group: 'basic' },
+  { key: 'nickname', label: t('system.user.nickname'), required: true, group: 'basic' },
+  { key: 'email', label: t('system.user.email'), group: 'contact' },
+  { key: 'phone', label: t('system.user.phone'), group: 'contact' },
   {
     key: 'status',
     label: t('system.user.status'),
@@ -153,7 +152,14 @@ const formFields = [
       { label: t('common.enable'), value: '0' },
       { label: t('common.disable'), value: '1' },
     ],
+    group: 'config',
   },
+]
+
+const formSections = [
+  { key: 'basic', title: '基本信息' },
+  { key: 'contact', title: '联系方式' },
+  { key: 'config', title: '状态配置' },
 ]
 
 async function request(params: Record<string, string | number>) {
@@ -190,12 +196,6 @@ function handleEdit(row: UserRow) {
 }
 
 async function handleSubmit() {
-  try {
-    await proFormRef.value?.validate()
-  } catch {
-    return
-  }
-
   if (editingUser.value) {
     await updateMutation.mutate(formValue.value)
   } else {
@@ -219,44 +219,15 @@ async function handleSubmit() {
     </template>
   </ProTable>
 
-  <n-modal
+  <ProModalForm
     v-model:show="showModal"
-    preset="dialog"
     :title="editingUser ? t('system.user.editUser') : t('system.user.addUser')"
-    class="user-modal"
-  >
-    <ProForm
-      ref="proFormRef"
-      :fields="formFields"
-      :model="formValue"
-      :disabled="createMutation.isLoading.value || updateMutation.isLoading.value"
-      @update:model="formValue = $event as typeof formValue"
-    >
-      <template #action>
-        <n-space justify="end">
-          <n-button @click="showModal = false">{{ t('common.cancel') }}</n-button>
-          <n-button
-            type="primary"
-            :loading="createMutation.isLoading.value || updateMutation.isLoading.value"
-            @click="handleSubmit"
-          >
-            {{ t('common.confirm') }}
-          </n-button>
-        </n-space>
-      </template>
-    </ProForm>
-  </n-modal>
+    :fields="formFields"
+    :sections="formSections"
+    :model="formValue"
+    :loading="createMutation.isLoading.value || updateMutation.isLoading.value"
+    :disabled="createMutation.isLoading.value || updateMutation.isLoading.value"
+    @update:model="formValue = $event as typeof formValue"
+    @submit="handleSubmit"
+  />
 </template>
-
-<style scoped>
-.user-modal {
-  width: 90%;
-  max-width: 500px;
-}
-
-@media (max-width: 767px) {
-  .user-modal {
-    width: 95%;
-  }
-}
-</style>
