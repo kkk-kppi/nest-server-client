@@ -137,4 +137,86 @@ describe('ProForm', () => {
 
     expect(wrapper.find('.n-checkbox').exists()).toBe(true)
   })
+
+  it('renders fields grouped by sections', () => {
+    const wrapper = mount(ProForm, {
+      props: {
+        fields: [
+          { key: 'name', label: 'Name', type: 'input', group: 'basic' },
+          { key: 'email', label: 'Email', type: 'input', group: 'contact' },
+        ],
+        sections: [
+          { key: 'basic', title: 'Basic Info' },
+          { key: 'contact', title: 'Contact' },
+        ],
+        model: { name: '', email: '' },
+        'onUpdate:model': vi.fn(),
+      },
+      global: { components: { NConfigProvider } },
+    })
+
+    expect(wrapper.text()).toContain('Basic Info')
+    expect(wrapper.text()).toContain('Contact')
+  })
+
+  it('hides fields when visible is false', () => {
+    const wrapper = mount(ProForm, {
+      props: {
+        fields: [
+          { key: 'name', label: 'Name', type: 'input', visible: true },
+          { key: 'secret', label: 'Secret', type: 'input', visible: false },
+        ],
+        model: { name: '', secret: '' },
+        'onUpdate:model': vi.fn(),
+      },
+      global: { components: { NConfigProvider } },
+    })
+
+    expect(wrapper.find('input').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Secret')
+  })
+
+  it('evaluates visible function against model', () => {
+    const wrapper = mount(ProForm, {
+      props: {
+        fields: [
+          { key: 'type', label: 'Type', type: 'input' },
+          { key: 'detail', label: 'Detail', type: 'input', visible: (model) => model.type === 'a' },
+        ],
+        model: { type: 'a', detail: '' },
+        'onUpdate:model': vi.fn(),
+      },
+      global: { components: { NConfigProvider } },
+    })
+
+    expect(wrapper.text()).toContain('Detail')
+  })
+
+  it('renders help text below field', () => {
+    const wrapper = mount(ProForm, {
+      props: {
+        fields: [{ key: 'name', label: 'Name', type: 'input', help: 'Enter your full name' }],
+        model: { name: '' },
+        'onUpdate:model': vi.fn(),
+      },
+      global: { components: { NConfigProvider } },
+    })
+
+    expect(wrapper.text()).toContain('Enter your full name')
+  })
+
+  it('collapses section when collapsible is true and defaultCollapsed is true', async () => {
+    const wrapper = mount(ProForm, {
+      props: {
+        fields: [{ key: 'name', label: 'Name', type: 'input', group: 'basic' }],
+        sections: [{ key: 'basic', title: 'Basic', collapsible: true, defaultCollapsed: true }],
+        model: { name: '' },
+        'onUpdate:model': vi.fn(),
+      },
+      global: { components: { NConfigProvider } },
+    })
+
+    const grid = wrapper.find('.n-grid')
+    expect(grid.attributes('style')).toContain('display: none')
+  })
 })
