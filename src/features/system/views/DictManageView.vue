@@ -1,19 +1,7 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue'
-import {
-  NTag,
-  NCard,
-  NDataTable,
-  NButton,
-  NSpace,
-  NPopconfirm,
-  NModal,
-  NForm,
-  NFormItem,
-  NInput,
-  NInputNumber,
-  NSelect,
-} from 'naive-ui'
+import { ref, computed, h, onMounted } from 'vue'
+import { NTag, NCard, NDataTable, NButton, NSpace, NPopconfirm } from 'naive-ui'
+import ProModalForm from '@/shared/components/pro/ProModalForm.vue'
 import {
   getDictTypeList,
   createDictType,
@@ -52,6 +40,46 @@ const dataFormValue = ref({
   sort: 0,
   status: '0' as '0' | '1',
 })
+
+const typeFormFields = computed(() => [
+  { key: 'name', label: '字典名称', required: true },
+  {
+    key: 'code',
+    label: '字典编码',
+    required: true,
+    disabled: !!editingType.value,
+  },
+  {
+    key: 'status',
+    label: '状态',
+    type: 'select' as const,
+    options: [
+      { label: '正常', value: '0' },
+      { label: '停用', value: '1' },
+    ],
+  },
+])
+
+const dataFormFields = [
+  { key: 'label', label: '标签', required: true, group: 'basic' },
+  { key: 'value', label: '值', required: true, group: 'basic' },
+  { key: 'sort', label: '排序', type: 'number' as const, group: 'config', props: { min: 0 } },
+  {
+    key: 'status',
+    label: '状态',
+    type: 'select' as const,
+    options: [
+      { label: '正常', value: '0' },
+      { label: '停用', value: '1' },
+    ],
+    group: 'config',
+  },
+]
+
+const dataFormSections = [
+  { key: 'basic', title: '基本信息' },
+  { key: 'config', title: '配置' },
+]
 
 const typeColumns: DataTableColumns<DictTypeData[number]> = [
   { title: '字典名称', key: 'name', width: 120 },
@@ -279,62 +307,24 @@ onMounted(() => {
     </n-card>
   </div>
 
-  <!-- 字典类型弹窗 -->
-  <n-modal
+  <ProModalForm
     v-model:show="showTypeModal"
-    preset="dialog"
     :title="editingType ? '编辑字典类型' : '新增字典类型'"
-    class="dict-modal"
-  >
-    <n-form :model="typeFormValue" label-width="80">
-      <n-form-item label="字典名称"><n-input v-model:value="typeFormValue.name" /></n-form-item>
-      <n-form-item label="字典编码">
-        <n-input v-model:value="typeFormValue.code" :disabled="!!editingType" />
-      </n-form-item>
-      <n-form-item label="状态">
-        <n-select
-          v-model:value="typeFormValue.status"
-          :options="[
-            { label: '正常', value: '0' },
-            { label: '停用', value: '1' },
-          ]"
-        />
-      </n-form-item>
-    </n-form>
-    <template #action>
-      <n-button @click="showTypeModal = false">取消</n-button>
-      <n-button type="primary" @click="handleTypeSubmit">确定</n-button>
-    </template>
-  </n-modal>
+    :fields="typeFormFields"
+    :model="typeFormValue"
+    @update:model="(val) => (typeFormValue = val as typeof typeFormValue)"
+    @submit="handleTypeSubmit"
+  />
 
-  <!-- 字典数据弹窗 -->
-  <n-modal
+  <ProModalForm
     v-model:show="showDataModal"
-    preset="dialog"
     :title="editingData ? '编辑字典数据' : '新增字典数据'"
-    class="dict-modal"
-  >
-    <n-form :model="dataFormValue" label-width="80">
-      <n-form-item label="标签"><n-input v-model:value="dataFormValue.label" /></n-form-item>
-      <n-form-item label="值"><n-input v-model:value="dataFormValue.value" /></n-form-item>
-      <n-form-item label="排序">
-        <n-input-number v-model:value="dataFormValue.sort" :min="0" />
-      </n-form-item>
-      <n-form-item label="状态">
-        <n-select
-          v-model:value="dataFormValue.status"
-          :options="[
-            { label: '正常', value: '0' },
-            { label: '停用', value: '1' },
-          ]"
-        />
-      </n-form-item>
-    </n-form>
-    <template #action>
-      <n-button @click="showDataModal = false">取消</n-button>
-      <n-button type="primary" @click="handleDataSubmit">确定</n-button>
-    </template>
-  </n-modal>
+    :fields="dataFormFields"
+    :sections="dataFormSections"
+    :model="dataFormValue"
+    @update:model="(val) => (dataFormValue = val as typeof dataFormValue)"
+    @submit="handleDataSubmit"
+  />
 </template>
 
 <style scoped>
@@ -346,21 +336,12 @@ onMounted(() => {
   flex: 1;
 }
 
-.dict-modal {
-  width: 90%;
-  max-width: 500px;
-}
-
 .dict-layout {
   display: flex;
   gap: var(--space-4);
 }
 
 @media (max-width: 767px) {
-  .dict-modal {
-    width: 95%;
-  }
-
   .dict-layout {
     flex-direction: column;
   }
