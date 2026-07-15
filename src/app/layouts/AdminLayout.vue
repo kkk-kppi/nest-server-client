@@ -117,6 +117,10 @@ onUnmounted(() => {
   height: 100vh;
 }
 
+aside {
+  height: 100%;
+}
+
 .admin-header {
   padding: 0 var(--space-4);
 }
