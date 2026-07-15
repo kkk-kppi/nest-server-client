@@ -47,25 +47,87 @@ function handleClose(name: string) {
 </script>
 
 <template>
-  <n-tabs
-    :value="activeTab"
-    type="card"
-    class="admin-tabs"
-    @update:value="handleTabChange"
-    @close="handleClose"
-  >
-    <n-tab
-      v-for="tab in tabs"
-      :key="tab.name"
-      :name="tab.name"
-      :tab="tab.title"
-      :closable="tabs.length > 1"
-    />
-  </n-tabs>
+  <div class="admin-tabs-wrapper">
+    <n-tabs
+      :value="activeTab"
+      type="card"
+      class="admin-tabs"
+      @update:value="handleTabChange"
+      @close="handleClose"
+    >
+      <n-tab
+        v-for="tab in tabs"
+        :key="tab.name"
+        :name="tab.name"
+        :tab="tab.title"
+        :closable="tabs.length > 1"
+      />
+    </n-tabs>
+  </div>
 </template>
 
 <style scoped>
-.admin-tabs {
-  padding: var(--space-1) 0;
+.admin-tabs-wrapper {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0 var(--space-4);
+}
+
+.admin-tabs :deep(.n-tabs-tab) {
+  border: none !important;
+  border-radius: 0 !important;
+  padding: var(--space-2) var(--space-3) !important;
+  margin: 0 !important;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast);
+  position: relative;
+}
+
+.admin-tabs :deep(.n-tabs-tab:hover) {
+  color: var(--color-primary);
+  background: transparent !important;
+}
+
+.admin-tabs :deep(.n-tabs-tab--active) {
+  color: var(--color-primary);
+  background: transparent !important;
+  font-weight: 500;
+}
+
+.admin-tabs :deep(.n-tabs-tab--active::after) {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+  border-radius: 1px 1px 0 0;
+}
+
+.admin-tabs :deep(.n-tabs-tab .n-tabs-tab__close) {
+  margin-left: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+.admin-tabs :deep(.n-tabs-tab:hover .n-tabs-tab__close) {
+  opacity: 1;
+}
+
+.admin-tabs :deep(.n-tabs-tab--active .n-tabs-tab__close) {
+  opacity: 0.6;
+}
+
+.admin-tabs :deep(.n-tabs-tab--active:hover .n-tabs-tab__close) {
+  opacity: 1;
+}
+
+.admin-tabs :deep(.n-tabs-nav) {
+  border-bottom: none !important;
+}
+
+.admin-tabs :deep(.n-tabs-tab-pad) {
+  display: none !important;
 }
 </style>

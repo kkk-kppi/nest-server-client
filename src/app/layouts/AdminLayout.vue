@@ -122,7 +122,7 @@ aside {
 }
 
 .admin-header {
-  padding: 0 var(--space-4);
+  padding: 0;
 }
 
 .mobile-overlay {
